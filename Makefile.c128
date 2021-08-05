@@ -1,0 +1,25 @@
+TARGET=c128
+AS=ca65
+CC=cl65
+
+VPATH=../src
+INCLUDE=../src
+SYS_INCLUDE=../src
+
+CFLAGS=-I. -I$(INCLUDE) -I$(SYS_INCLUDE) -O -t $(TARGET)
+
+OBJECTS=  vt100_escape.o acia_recv.o putchar80.o scroll.o char_tables.o soft80-font.o
+
+LIBS=
+
+all:    gterm128 gterm128.bin
+
+gterm128: gterm128.o $(OBJECTS)
+	ld65 $< $(OBJECTS) -t $(TARGET) --lib $(TARGET).lib -o $@
+
+gterm128.o: gterm.c
+	cl65 $(CFLAGS) -DCART -c -o $@ $<
+
+
+%.bin: %.o bin128_16k.o $(OBJECTS)
+	ld65 bin128_16k.o $< $(OBJECTS) -C $(SYS_INCLUDE)/bin128_16k.cfg --lib $(TARGET).lib -o $@

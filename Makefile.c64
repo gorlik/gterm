@@ -1,0 +1,44 @@
+TARGET=c64
+AS=ca65
+CC=cl65
+
+VPATH=../src
+INCLUDE=../src
+SYS_INCLUDE=../src
+
+CFLAGS=-I. -I$(INCLUDE) -I$(SYS_INCLUDE) -O -t $(TARGET)
+
+OBJECTS=  vt100_escape.o variables.o acia_recv.o putchar80.o scroll.o \
+	char_tables.o soft80-font.o
+
+LIBS=
+
+all:    gterm64 gterm64.crt gterm64-96.bin gterm64-384.bin gterm64-576.bin gterm64-1152.bin
+	cat gterm64-96.bin gterm64-384.bin gterm64-576.bin gterm64-1152.bin >gterm64.bin
+
+gterm64: gterm64.o $(OBJECTS)
+	ld65 $< $(OBJECTS) $(LIBS) -C $(SYS_INCLUDE)/c64zp.cfg --lib $(TARGET).lib -o $@
+
+gterm64.o: gterm.c
+	cl65 $(CFLAGS) -c -o $@ $<
+
+gterm64-96.o: gterm.c
+	cl65 $(CFLAGS) -DDEF_BAUD_IDX=1 -c -o $@ $<
+
+gterm64-384.o: gterm.c
+	cl65 $(CFLAGS) -DDEF_BAUD_IDX=3 -c -o $@ $<
+
+gterm64-576.o: gterm.c
+	cl65 $(CFLAGS) -DDEF_BAUD_IDX=4 -c -o $@ $<
+
+gterm64-1152.o: gterm.c
+	cl65 $(CFLAGS) -DDEF_BAUD_IDX=5 -c -o $@ $<
+
+%.crt: %.o cart64_16k.o $(OBJECTS)
+	ld65 cart64_16k.o $< $(OBJECTS) $(LIBS) -C $(SYS_INCLUDE)/cart64_16k.cfg --lib $(TARGET).lib -o $@
+
+%.bin: %.o bin64_16k.o $(OBJECTS)
+	ld65 bin64_16k.o $< $(OBJECTS) $(LIBS) -C $(SYS_INCLUDE)/bin64_16k.cfg --lib $(TARGET).lib -o $@
+
+#%.bin: %.crt
+#	cartconv -i $< -o $@
