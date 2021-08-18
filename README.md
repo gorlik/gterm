@@ -41,6 +41,7 @@ The differences between the Commodore keyboard and the VT100 keyboard makes nece
 | ESC    | ← |   |
 | TAB    | RUN STOP | |
 | \\     | £        | |
+| {      | SHIFT + '@'  | |
 | ¦      | SHIFT + '+'  | |
 | }      | SHIFT + '*'  | |	 
 | _      | SHIFT + '-' 	| |
