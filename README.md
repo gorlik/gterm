@@ -35,7 +35,7 @@ The function keys F1 (baud up) and F3 (baud down) can be used to change the baud
 The differences between the Commodore keyboard and the VT100 keyboard makes necessary to translate some keys. The following table has a summary of the mappings:
 
 | VT100  | Commodore | Notes |
-| ---    | ---       |       |
+| --- | --- | --- |
 | CTRL 	| Commodore Key |	Easier to reach and similar location as a PC keyboard |
 | F1-F10 | CTRL + number |	Can't use the Commdore function keys as most linux software expects 10 of them
 | ESC    | ← |   |
