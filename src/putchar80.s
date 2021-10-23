@@ -235,11 +235,9 @@ cont2:
 	iny
 	sty t1
 	jsr _Put2Char80
-	lda t1
-	cmp #80
-	beq end
-	tay
-	jmp start
+	ldy t1
+	cpy #80
+	bne start
 end:
  	rts
 .endproc
