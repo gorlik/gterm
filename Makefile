@@ -14,7 +14,7 @@ c64: autogen
 #	cd build-c128; make -f ../Makefile.c128
 
 clean:
-	rm -rf build-c64 build-c128 src/soft80-font.s src/ascii_define.h src/char_tables.c gterm_bin.tar.gz
+	rm -rf build-c64 build-c128 src/soft80-font.c src/ascii_define.h src/char_tables.c gterm_bin.tar.gz
 	cd utils; make clean
 
 bin: all
@@ -22,7 +22,7 @@ bin: all
 		build-c64/*.bin  build-c64/*.crt  build-c64/gterm64
 
 autogen: tools
-	utils/make_font_table charset/soft80-charset.bin >src/soft80-font.s
+	utils/make_font_table charset/soft80-charset.bin >src/soft80-font.c
 	utils/make_conv_table h >src/ascii_define.h
 	utils/make_conv_table c >src/char_tables.c
 	utils/make_isalpha >> src/char_tables.c
