@@ -1,6 +1,10 @@
 all: c64
 # c128
 
+SERIAL=/dev/ttyUSB4
+ACIACONFIG= -acia1 -acia1mode 2 -acia1irq 1 -acia1base 0xde00 -rsdev1baud 38400 -rsdev2 $(SERIAL)
+
+
 c64: autogen
 	mkdir -p build-c64
 	cd build-c64; make -f ../Makefile.c64
@@ -25,7 +29,7 @@ autogen: tools
 
 
 test: all
-	x64 -cart16 build-c64/gterm64.bin -acia1 -acia1mode 2 -acia1irq 2 -acia1base 0xde00 -rsdev1baud 38400
+	x64 -cartcrt build-c64/gterm64.crt $(ACIACONFIG)
 
 #	x128 -extfrom build-c128/cterm128.bin -extfunc 1
 
