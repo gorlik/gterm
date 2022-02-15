@@ -18,31 +18,30 @@ char *ascii_table[128] =
    "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "BRACKET_OPEN", "BACKSLASH", "BRACKET_CLOSE", "CARET", "UNDERSCORE",
    "REV_QUOTE", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o",
    "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "CURLY_OPEN", "PIPE", "CURLY_CLOSE", "TILDE", "DEL",
-   
   };
 
 
 unsigned char conv_table[0xc0] =
   {
-   /*    mapped code        function       petscii      key press   alt key press */   
+   /*    mapped code        function       petscii      key press   alt key press */
    CTRL_KEY + '@' - '@', /* CTRL + @         0x00       CTRL + @                  */
    CTRL_KEY + 'A' - '@', /* CTRL + A         0x01       CTRL + A                  */
    CTRL_KEY + 'B' - '@', /* CTRL + B         0x02       CTRL + B                  */
    0x09,                 /* TAB              0x03       CTRL + C      RUN STOP    */
    CTRL_KEY + 'D' - '@', /* CTRL + D         0x04       CTRL + D                  */
-   TERM_FUNC_KEY + 1,    /* F2               0x05       CTRL + E      CTRL + 2  */
-   CTRL_KEY + 'F' - '@', /* CTRL + F         0x06       CTRL + F      CTRL + LEFT_ARROW   */ 
+   TERM_FUNC_KEY + 1,    /* F2               0x05       CTRL + E      CTRL + 2    */
+   CTRL_KEY + 'F' - '@', /* CTRL + F         0x06       CTRL + F      CTRL + LEFT_ARROW */
    CTRL_KEY + 'G' - '@', /* CTRL + G         0x07       CTRL + G                  */
    CTRL_KEY + 'H' - '@', /* CTRL + H         0x08       CTRL + H                  */
    CTRL_KEY + 'I' - '@', /* CTRL + I         0x09       CTRL + I                  */
    CTRL_KEY + 'J' - '@', /* CTRL + J         0x0a       CTRL + J                  */
    CTRL_KEY + 'K' - '@', /* CTRL + K         0x0b       CTRL + K                  */
    CTRL_KEY + 'L' - '@', /* CTRL + I         0x0c       CTRL + L                  */
-   CTRL_KEY + 'M' - '@', /* CTRL + M         0x0d       CTRL + M      RETURN    */
+   CTRL_KEY + 'M' - '@', /* CTRL + M         0x0d       CTRL + M      RETURN      */
    CTRL_KEY + 'N' - '@', /* CTRL + N         0x0e       CTRL + N                  */
    CTRL_KEY + 'O' - '@', /* CTRL + O         0x0f       CTRL + O                  */
    CTRL_KEY + 'P' - '@', /* CTRL + P         0x10       CTRL + P                  */
-   CURSOR_KEY + 'B'-'A', /* CURSOR DOWN      0x11       CTRL + Q      CURSOR DOWN          */
+   CURSOR_KEY + 'B'-'A', /* CURSOR DOWN      0x11       CTRL + Q      CURSOR DOWN */
    TERM_FUNC_KEY + 8,    /* F9               0x12       CTRL + R      CTRL + 9    */
    0xff,                 /* NO_MAP           0x13       CTRL + S      HOME        */
    0x7f,                 /* CTRL + T         0x14       CTRL + T      DELETE      */
@@ -54,7 +53,7 @@ unsigned char conv_table[0xc0] =
    CTRL_KEY + 'Z' - '@', /* CTRL + Z         0x1a       CTRL + Z                  */
    0x1b,                 /* ESC              0x1b       CTRL + [                  */
    TERM_FUNC_KEY + 2,    /* F3               0x1c       CTRL + POUND  CTRL + 3    */
-   CURSOR_KEY + 'C'-'A', /* CURSOR RIGHT     0x1d       CTRL + ]      CURSOR RIGHT           */
+   CURSOR_KEY + 'C'-'A', /* CURSOR RIGHT     0x1d       CTRL + ]      CURSOR RIGHT */
    TERM_FUNC_KEY + 5,    /* F6               0x1e       CTRL + ^      CTRL + 6    */
    TERM_FUNC_KEY + 6,    /* F7               0x1f                     CTRL + 7    */
 
@@ -91,7 +90,7 @@ unsigned char conv_table[0xc0] =
    '=',                  /* =                0x3d       SPACE */
    '>',                  /* >                0x3e       SPACE */
    '?',                  /* ?                0x3f       SPACE */
-   
+
    '@',                  /* @                0x40       SPACE */
    'a',                  /* a                0x41       SPACE */
    'b',                  /* b                0x42       SPACE */
@@ -108,7 +107,7 @@ unsigned char conv_table[0xc0] =
    'm',                  /* m                0x4d       SPACE */
    'n',                  /* n                0x4e       SPACE */
    'o',                  /* o                0x4f       SPACE */
-   
+
    'p',                  /* p                0x50       SPACE */
    'q',                  /* q                0x51       SPACE */
    'r',                  /* r                0x52       SPACE */
@@ -125,7 +124,7 @@ unsigned char conv_table[0xc0] =
    ']',                  /* ]                0x5d       ] */
    '^',                  /* .                0x5e       ^ */
    0x1b,                 /* ESC              0x5f       LEFT ARROW */
-   
+
    '}',                  /* }                0x60       SHIFT + '*' */
    'A',                  /* A                0x61       SPACE */
    'B',                  /* B                0x62       SPACE */
@@ -142,7 +141,7 @@ unsigned char conv_table[0xc0] =
    'M',                  /* M                0x6d       SPACE */
    'N',                  /* N                0x6e       SPACE */
    'O',                  /* O                0x6f       SPACE */
-   
+
    'P',                  /* P                0x70       SPACE */
    'Q',                  /* Q                0x71       SPACE */
    'R',                  /* R                0x72       SPACE */
@@ -173,7 +172,7 @@ unsigned char conv_table[0xc0] =
    CBM_FUNC_KEY + 3,     /* CBM_F4           0x8a       F4             */
    CBM_FUNC_KEY + 5,     /* CBM_F6           0x8b       F6             */
    CBM_FUNC_KEY + 7,     /* CBM_F8           0x8c       F8             */
-   0xff,                 /* NO_MAP           0x8d       SHIFT + RETURN */
+   0x8d,                 /* RETURN           0x8d       SHIFT + RETURN */
    0xff,                 /* NO_MAP           0x8e       NO_KEY         */
    0xff,                 /* NO_MAP           0x8f       NO_KEY         */
 
@@ -210,7 +209,7 @@ unsigned char conv_table[0xc0] =
    'Z' - '@',            /* CTRL + Z         0xad       CBM + Z        */
    'S' - '@',            /* CTRL + S         0xae       CBM + S        */
    'P' - '@',            /* CTRL + P         0xaf       CBM + P        */
-   
+
    'A' - '@',            /* CTRL + A         0xb0       CBM + A        */
    'E' - '@',            /* CTRL + E         0xb1       CBM + E        */
    'R' - '@',            /* CTRL + R         0xb2       CBM + R        */
@@ -246,7 +245,7 @@ int main(int argc, char *argv[])
       printf("#define SPECIAL_FUNC   0x%02X\n", SPECIAL_FUNC);
       printf("#define UNMAPPED_KEY   0x%02X\n", UNMAPPED_KEY);
       printf("\n\n");
-      
+
       for(i=0;i<128;i++) {
 	printf("#define ASCII_%s 0x%02X\n", ascii_table[i],i);
       }
@@ -256,17 +255,16 @@ int main(int argc, char *argv[])
       printf("/* PETSCII to ASCII */\n\n");
 
       printf("#pragma rodata-name (\"TABLES\")\n\n");
-      
-      printf("const unsigned char conv_table[256] =\n  {\n");
+
+      printf("const unsigned char conv_table[256] = {\n");
       for(i=0;i<256;i++) {
 	t=i;
 	if(t>=192 && t<=223) t-=96;
 	else if(t>=224 && t<=254) t-=64;
 	else if(t==255) t=126;
 
-	printf("0x%02x,",conv_table[t]);
+	printf("0x%02x, ",conv_table[t]);
 	if((i+1)%16==0) printf("\n");
-	  
       }
       printf("};\n");
       break;
@@ -279,11 +277,8 @@ int main(int argc, char *argv[])
     printf("%s  h : create include file\n",argv[0]);
     printf("%s  c : create c file\n",argv[0]);
   }
-  
-  //  printf("const unsigned char isxx[256] = {\n");
 
-
-  //  printf("};\n");
+  printf("\n");
 
   return 0;
 }
