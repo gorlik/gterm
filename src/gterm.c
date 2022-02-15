@@ -105,12 +105,21 @@ const struct baud_table_t baud_table[] =
 void (*Scroll1)(void);
 void (*InvScroll1)(void);
 
+#ifdef __SDCC
+static void memset8(unsigned char *a, unsigned char v, unsigned char count)
+{
+  while(count) {
+    a[--count]=v;
+  }
+}
+#else
 #define memset8(addr, v, c) \
   __asm__("ldx #%b",c);	    \
   __asm__("lda #%b",v);		      \
   __asm__("l%v: sta %v-1,x",addr,addr);   \
   __asm__("dex"); \
   __asm__("bne l%v",addr);
+#endif
 
 unsigned char __fastcall__ recv_fifo_fill(void)
 {
@@ -320,7 +329,9 @@ unsigned char loc_csave;
 
 void PutTitleAt(unsigned char c)
 {
+#ifndef __SDCC
   conv_str(STR_BUF);
+#endif
   loc_csave=COL;
   line_save=line_addr;
   COL=c;
@@ -332,7 +343,9 @@ void PutTitleAt(unsigned char c)
 
 void PutLineAt(unsigned char r, unsigned char c)
 {
+#ifndef __SDCC
   conv_str(STR_BUF);
+#endif
   loc_csave=COL;
   line_save=line_addr;
   COL=c;
@@ -448,9 +461,13 @@ int main()
 
   Scroll1=FS_Scroll1;
   InvScroll1=FS_InvScroll1;
-  
+#ifdef __SDCC
+  sprintf(STR_BUF,"GGLABS Terminal V%s - %s (SDCC V%d.%d.%d) http://gglabs.us", VERSION, __DATE__,
+	  __SDCC_VERSION_MAJOR, __SDCC_VERSION_MINOR, __SDCC_VERSION_PATCH );
+#else
   sprintf(STR_BUF,"GGLABS Terminal V%s - %s (CC65 V2.%d) - http://gglabs.us", VERSION, __DATE__,
 	  (__CC65__-0x200)>>4);
+#endif
   PutLineAt(0,0);
   sprintf(STR_BUF,"A modern VT100 terminal emulator for the Commodore 64");
   PutLineAt(1,0);

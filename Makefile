@@ -8,13 +8,15 @@ ACIACONFIG= -acia1 -acia1mode 2 -acia1irq 1 -acia1base 0xde00 -rsdev1baud 38400 
 c64: autogen
 	mkdir -p build-c64
 	cd build-c64; make -f ../Makefile.c64
+	mkdir -p build-sdcc
+	cd build-sdcc; make -f ../Makefile.sdcc
 
 #c128:
 #	mkdir -p build-c128
 #	cd build-c128; make -f ../Makefile.c128
 
 clean:
-	rm -rf build-c64 build-c128 src/soft80-font.c src/ascii_define.h src/char_tables.c gterm_bin.tar.gz
+	rm -rf build-c64 build-c128 build-sdcc src/soft80-font.c src/ascii_define.h src/char_tables.c gterm_bin.tar.gz
 	cd utils; make clean
 
 bin: all
@@ -30,7 +32,7 @@ autogen: tools
 
 test: all
 	x64 -cartcrt build-c64/gterm64.crt $(ACIACONFIG)
-
+	x64 -cart16 build-sdcc/gterm.bin $(ACIACONFIG)
 #	x128 -extfrom build-c128/cterm128.bin -extfunc 1
 
 tools:

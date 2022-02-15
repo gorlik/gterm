@@ -1,0 +1,47 @@
+SDCCROOT = /mnt/share/local/sdcc-exp/bin
+SDCC = $(SDCCROOT)/sdcc
+SDAS = $(SDCCROOT)/sdas6500
+MAKEBIN = $(SDCCROOT)/makebin
+
+SDKROOT = ../../../cbm-games/cbm-sdk
+TARGET = -mmos6502 -D__C64__
+SDCCOPT=--max-allocs-per-node 25000 --opt-code-speed
+SDCCDEBUG=--fverbose-asm --i-code-in-asm
+SDKINC = -I $(SDKROOT)/include
+
+VPATH=../src
+INCLUDE=../src
+SYS_INCLUDE=../src
+CART = --code-loc 0x8000 --xram-loc 0x1000 $(SDKROOT)/lib/c64_cart_crt0.rel
+PRG = --code-loc 0x7ff --xram-loc 0x8000 $(SDKROOT)/lib/c64_prg_crt0.rel
+LIBS = -l c64.lib
+
+CFLAGS = $(TARGET) $(SDCCOPT) $(SDKINC)
+LDFLAGS = -L $(SDKROOT)/lib --out-fmt-ihx -mmos6502 --no-std-crt0
+
+CFLAGS += -I. -I$(INCLUDE) -I$(SYS_INCLUDE)
+
+OBJECTS=  vt100_escape.rel acia_recv_as.rel putchar80_as.rel scroll_as.rel \
+	char_tables.rel soft80-font.rel
+
+gterm.bin:
+
+clean:
+	rm -f *.ihx *.rel *.map *.noi *.asm *.lk *.sym *.lst
+
+.PRECIOUS: %.rel %.ihx
+
+%.bin: %.rel $(OBJECTS)
+	$(SDCC) $(LDFLAGS) $(CART) $(LIBS) $(OBJECTS) $< -o $@.ihx
+	$(MAKEBIN) -o 0x8000 -s 0xc000 $@.ihx $@
+
+
+%.prg: %.rel $(OBJECTS)
+	$(SDCC) $(LDFLAGS) $(PRG) $(LIBS) $(OBJECTS) $< -o $@.ihx
+	$(MAKEBIN) -o 0x7ff -s 0xd000 -p $@.ihx $@
+
+%.rel: %.c
+	$(SDCC) $(CFLAGS) -c -o $@ $<
+
+%.rel: %.s
+	$(SDAS) -jxlosp $@ $<

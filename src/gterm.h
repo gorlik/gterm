@@ -21,6 +21,10 @@
 #ifndef GTERM_H
 #define GTERM_H
 
+#ifdef __SDCC
+#define __fastcall__
+#endif
+
 // zero page variables
 #define itemp_ptr    0xA3
 #define itemp        (*((unsigned int *)  itemp_ptr))
@@ -127,6 +131,14 @@ void __fastcall__ ClrTo(void);
 void __fastcall__ ClrFrom(void);
 
 // zero-page variables from ASM
+#ifdef __SDCC
+unsigned char *  __data __at (0xd1) SRC_LINE;
+extern unsigned char * __data line_addr;
+unsigned char __data __at (0xd6) ROW;
+unsigned char __data __at (0xd3) COL;
+extern unsigned char __data get,put;
+extern unsigned char __data c1,c2;
+#else
 extern unsigned char * SRC_LINE;
 #pragma zpsym("SRC_LINE")
 extern unsigned char * line_addr;
@@ -141,6 +153,7 @@ extern unsigned char get,put;
 extern unsigned char c1,c2;
 #pragma zpsym("c1")
 #pragma zpsym("c2")
+#endif
 
 extern unsigned char STR_BUF[];  // temp string buffer
 extern unsigned char SER_BUF[];  // rx buffer
