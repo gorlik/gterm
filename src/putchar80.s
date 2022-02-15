@@ -1,7 +1,7 @@
 ;******************************************************************************
 ;*  GTERM - GGLABS TERMINAL                                                   *
 ;*  A fast 80 columns terminal for the C64                                    *
-;*  Copyright 2019 Gabriele Gorla                                             *
+;*  Copyright 2019-2022 Gabriele Gorla                                        *
 ;*                                                                            *
 ;*  This program is free software: you can redistribute it and/or modify      *
 ;*  it under the terms of the GNU General Public License as published by      *
@@ -43,12 +43,9 @@ t2:
 	;; t2: iverse mask
 	;; carry bit -> invert char
 
-	clc
 	lda _attr
-	and #$01
-	beq pskip
-	sec
-pskip:	
+	ror a 			; put bit 1 of _attr in the carry
+
 	lda _c1	    ;;  a: char
 	tax
 	ldy #$00
