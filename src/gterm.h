@@ -126,12 +126,13 @@ void __fastcall__ Put2Char80(void);
 void __fastcall__ ClrTo(void);
 void __fastcall__ ClrFrom(void);
 
-// variables from ASM
+// zero-page variables from ASM
 extern unsigned char * SRC_LINE;
 #pragma zpsym("SRC_LINE")
 extern unsigned char * line_addr;
 #pragma zpsym("line_addr")
-extern unsigned char ROW, COL;
+extern unsigned char ROW;
+extern unsigned char COL;
 #pragma zpsym("ROW")
 #pragma zpsym("COL")
 extern unsigned char get,put;
@@ -167,16 +168,7 @@ extern unsigned char tab[10]; // tab stops (80 bits)
 // storage for save/restore cursor
 extern unsigned char col_save, row_save, attr_save; 
 
-
 extern unsigned char * line_temp;
 extern unsigned char ctemp;
-
-
-#define memset8(addr, v, c) \
-  __asm__("ldx #%b",c);	    \
-  __asm__("lda #%b",v);		      \
-  __asm__("l%v: sta %v-1,x",addr,addr);   \
-  __asm__("dex"); \
-  __asm__("bne l%v",addr);
 
 #endif

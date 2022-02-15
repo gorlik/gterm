@@ -1,7 +1,7 @@
 /******************************************************************************
  *  GTERM - GGLABS TERMINAL                                                   *
  *  A fast 80 columns terminal for the C64                                    *
- *  Copyright 2019 Gabriele Gorla                                             *
+ *  Copyright 2019-2022 Gabriele Gorla                                        *
  *                                                                            *
  *  This program is free software: you can redistribute it and/or modify      *
  *  it under the terms of the GNU General Public License as published by      *
@@ -25,7 +25,7 @@
 #include "asc_ctype.h"
 #include "ascii_define.h"
 
-#define VERSION "0.18"
+#define VERSION "0.19"
 
 #define SPR_BASE   (COLOR_BASE+0x3f8)
 
@@ -104,6 +104,13 @@ const struct baud_table_t baud_table[] =
 
 void (*Scroll1)(void);
 void (*InvScroll1)(void);
+
+#define memset8(addr, v, c) \
+  __asm__("ldx #%b",c);	    \
+  __asm__("lda #%b",v);		      \
+  __asm__("l%v: sta %v-1,x",addr,addr);   \
+  __asm__("dex"); \
+  __asm__("bne l%v",addr);
 
 unsigned char __fastcall__ recv_fifo_fill(void)
 {
@@ -442,11 +449,12 @@ int main()
   Scroll1=FS_Scroll1;
   InvScroll1=FS_InvScroll1;
   
-  sprintf(STR_BUF,"GGLABS Terminal V%s - http://gglabs.us",VERSION);
+  sprintf(STR_BUF,"GGLABS Terminal V%s - %s (CC65 V2.%d) - http://gglabs.us", VERSION, __DATE__,
+	  (__CC65__-0x200)>>4);
   PutLineAt(0,0);
   sprintf(STR_BUF,"A modern VT100 terminal emulator for the Commodore 64");
   PutLineAt(1,0);
-  sprintf(STR_BUF,"Copyright (c) 2019 Gabriele Gorla");
+  sprintf(STR_BUF,"Copyright (c) 2019-2022 Gabriele Gorla");
   PutLineAt(2,0);
   
   sprintf(STR_BUF,"This program is free software: you can redistribute it and/or modify it under");
