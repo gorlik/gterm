@@ -54,11 +54,11 @@
 	cmp #$F0 		; 2
 	bpl end_nmi 		; 2-4
 	
-	;; clear RTS	
+	;; clear ACIA RTS
 	lda #$01		; 2
 	sta ACIA_COMMAND	; 4
 	lda #$05		; 2
-	sta _SCR_BASE-$400+38	; 4
+	sta _SCR_BASE-$400+38	; 4 - on screen receive "led"
 
 	;; return from interrupt
 end_nmi:
