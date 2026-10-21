@@ -40,7 +40,7 @@ ACIA_CONTROL = (_ACIA_BASE+3)
 ACIA_EXT     = (_ACIA_BASE+7)
 
 	
-.area	CSEG
+.area	CODE
 
 ;; ****************** NMI Interrupt *********************
 ;; 59-60 cycles (70 when clearing RTS) + NMI entry 

@@ -20,28 +20,28 @@
 				;//.include "gterm.inc"
 .module soft80
 .globl _soft80_charset
-	
+
 .globl _PutLine
 .globl _PutChar80
 .globl _Put2Char80
 .globl _ClrTo
 .globl _ClrFrom
 
-	.globl _attr
-	.globl _c1, _c2
-	.globl _ROW, _COL
-	.globl _line_addr
-	.globl _STR_BUF
-	.globl _SCR_BASE
-	.globl _COLOR_BASE
-	.globl _SPR_DATA
+.globl _attr
+.globl _c1, _c2
+.globl _ROW, _COL
+.globl _line_addr
+.globl _STR_BUF
+.globl _SCR_BASE
+.globl _COLOR_BASE
+.globl _SPR_DATA
 
-	_SCR_BASE = 0x6000
-	_COLOR_BASE = _SCR_BASE-0x400
-        _SPR_DATA   = _COLOR_BASE-64
+_SCR_BASE = 0x6000
+_COLOR_BASE = _SCR_BASE-0x400
+_SPR_DATA   = _COLOR_BASE-64
 
 
-.area DSEG
+.area ZP
 t1:
 	.db 1
 t2:
@@ -56,12 +56,12 @@ _put::
 	.db 1
 _line_addr::
 	.db 2
-	
-.area CSEG
+
+.area CODE
 
 ;//CHAR_E = _soft80_charset
 ;//CHAR_O = _soft80_charset+0x400
-	
+
 
 ; ****************** PutChar *********************
 ;  Put a character

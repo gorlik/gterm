@@ -39,7 +39,7 @@
 .globl _SRC_LINE
 	
 
-.area	CSEG
+.area	CODE
 
 ; ****************** clrscr *********************
 ;  clear screen (skip title line)
