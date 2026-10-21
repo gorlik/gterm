@@ -1,7 +1,7 @@
 ;******************************************************************************
 ;*  GTERM - GGLABS TERMINAL                                                   *
 ;*  A fast 80 columns terminal for the C64                                    *
-;*  Copyright 2022 Gabriele Gorla                                             *
+;*  Copyright 2022-2026 Gabriele Gorla                                        *
 ;*                                                                            *
 ;*  This program is free software: you can redistribute it and/or modify      *
 ;*  it under the terms of the GNU General Public License as published by      *
@@ -20,7 +20,7 @@
 				;//.include "gterm.inc"
 .module soft80
 .globl _soft80_charset
-
+	
 .globl _PutLine
 .globl _PutChar80
 .globl _Put2Char80
@@ -36,9 +36,9 @@
 .globl _COLOR_BASE
 .globl _SPR_DATA
 
-_SCR_BASE = 0x6000
-_COLOR_BASE = _SCR_BASE-0x400
-_SPR_DATA   = _COLOR_BASE-64
+	_SCR_BASE = 0x6000
+	_COLOR_BASE = _SCR_BASE-0x400
+        _SPR_DATA   = _COLOR_BASE-64
 
 
 .area ZP
@@ -56,12 +56,12 @@ _put::
 	.db 1
 _line_addr::
 	.db 2
-
+	
 .area CODE
 
 ;//CHAR_E = _soft80_charset
 ;//CHAR_O = _soft80_charset+0x400
-
+	
 
 ; ****************** PutChar *********************
 ;  Put a character
@@ -70,17 +70,10 @@ _PutChar80:
 	;; t2: iverse mask
 	;; carry bit -> invert char
 
-;//	clc
-;//	lda _attr
-;//	and #0x01
-;//	beq pskip
-;//	sec
-;//pskip:
 	lda _attr
 	ror a 			; put bit 1 of _attr in the carry
 
-	lda *_c1	    ;;  a: char
-	tax
+	ldx *_c1	    ;;  a: char
 	ldy #0x00
 	sty *t2
 	lda *_COL
@@ -175,7 +168,7 @@ _Put2Char80:
 	lda _attr
 	bne generic
 	;; optimized version (no reverse and no underline)
-cline = 0
+	cline = 0
 .rept 8
 	ldx *_c1
 	lda _soft80_charset+cline*128,x
@@ -185,12 +178,23 @@ cline = 0
 	iny
 	cline = cline + 1
 .endm
-	jmp p2c_end
+
+p2c_end:	
+	inc *_COL
+	inc *_COL
+	lda *_line_addr
+	clc
+	adc #0x08
+	bne no_carry_p2c
+	inc *_line_addr+1
+no_carry_p2c:
+	sta *_line_addr
+	rts
 
 ;  generic version (reverse and underline support)
 generic:	
-	sty *t2
-	lda _attr
+	sty *t2			; y is still 0
+;	lda _attr		; _attr is already loaded
 	and #0x01 		; inverse
 	beq iskip
 	lda #0xff
@@ -233,18 +237,7 @@ iter7:
 	eor *t2
 	sta [_line_addr],y
 	;	iny
-
-p2c_end:	
-	inc *_COL
-	inc *_COL
-	lda *_line_addr
-	clc
-	adc #0x08
-	bne no_carry_p2c
-	inc *_line_addr+1
-no_carry_p2c:
-	sta *_line_addr
-	rts
+	jmp p2c_end
 
 	
 ; ****************** PutLine *********************

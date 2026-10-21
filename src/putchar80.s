@@ -1,7 +1,7 @@
 ;******************************************************************************
 ;*  GTERM - GGLABS TERMINAL                                                   *
 ;*  A fast 80 columns terminal for the C64                                    *
-;*  Copyright 2019-2022 Gabriele Gorla                                        *
+;*  Copyright 2019-2026 Gabriele Gorla                                        *
 ;*                                                                            *
 ;*  This program is free software: you can redistribute it and/or modify      *
 ;*  it under the terms of the GNU General Public License as published by      *
@@ -46,8 +46,7 @@ t2:
 	lda _attr
 	ror a 			; put bit 1 of _attr in the carry
 
-	lda _c1	    ;;  a: char
-	tax
+	ldx _c1	    ;;  a: char
 	ldy #$00
 	sty t2
 	lda _COL
@@ -148,12 +147,22 @@ end2:
 	sta (_line_addr),y
 	iny
 .endrepeat
-	jmp end
+end:	
+	inc _COL
+	inc _COL
+	lda _line_addr
+	clc
+	adc #$08
+	bne no_carry2
+	inc _line_addr+1
+no_carry2:
+	sta _line_addr
+	rts
 
 ;  generic version (reverse and underline support)
 generic:	
-	sty t2
-	lda _attr
+	sty t2			; y is still 0
+;	lda _attr		; _attr is already loaded
 	and #$01 		; inverse
 	beq iskip
 	lda #$ff
@@ -194,18 +203,8 @@ iter7:
 	eor t2
 	sta (_line_addr),y
 	;	iny
+	jmp end
 
-end:	
-	inc _COL
-	inc _COL
-	lda _line_addr
-	clc
-	adc #$08
-	bne no_carry2
-	inc _line_addr+1
-no_carry2:
-	sta _line_addr
-	rts
 .endproc
 	
 ; ****************** PutLine *********************
