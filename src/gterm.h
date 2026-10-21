@@ -97,7 +97,7 @@ void parse_control(void);
 
 // other prototypes
 void PutTitleAt(unsigned char c);
-void send_str(unsigned char *str);
+void send_str(const char *str);
 
 void ScrollRegion(void);
 void InvScrollRegion(void);
@@ -132,12 +132,12 @@ void __fastcall__ ClrFrom(void);
 
 // zero-page variables from ASM
 #ifdef __SDCC
-unsigned char *  __data __at (0xd1) SRC_LINE;
-extern unsigned char * __data line_addr;
-unsigned char __data __at (0xd6) ROW;
-unsigned char __data __at (0xd3) COL;
-extern unsigned char __data get,put;
-extern unsigned char __data c1,c2;
+unsigned char *  __zp __at (0xd1) SRC_LINE;
+extern unsigned char * __zp line_addr;
+unsigned char __zp __at (0xd6) ROW;
+unsigned char __zp __at (0xd3) COL;
+extern unsigned char __zp get,put;
+extern unsigned char __zp c1,c2;
 #else
 extern unsigned char * SRC_LINE;
 #pragma zpsym("SRC_LINE")
@@ -155,16 +155,16 @@ extern unsigned char c1,c2;
 #pragma zpsym("c2")
 #endif
 
-extern unsigned char STR_BUF[];  // temp string buffer
-extern unsigned char SER_BUF[];  // rx buffer
+extern char STR_BUF[];  // temp string buffer
+extern char SER_BUF[];  // rx buffer
 extern unsigned char SCR_BASE[]; // screen base
 extern unsigned char COLOR_BASE[]; // color base
 extern unsigned char SPR_DATA[];   // cursor sprite
 
 extern volatile struct acia_t ACIA_BASE;
 
-extern const unsigned char soft80_charset[]; // soft80 font
-extern const unsigned char conv_table[256];  // petscii to ascii
+extern const char soft80_charset[]; // soft80 font
+extern const char conv_table[256];  // petscii to ascii
 extern unsigned char * const line[];           // precomputed line address
 
 // global variables

@@ -1,9 +1,9 @@
-SDCCROOT = /mnt/share/local/sdcc-exp/bin
+SDCCROOT = /mnt/share/local/sdcc-svn/bin
 SDCC = $(SDCCROOT)/sdcc
 SDAS = $(SDCCROOT)/sdas6500
 MAKEBIN = $(SDCCROOT)/makebin
 
-SDKROOT = ../../../cbm-games/cbm-sdk
+SDKROOT = ../../../sdcc-sdk/sdcc-6502-sdk
 TARGET = -mmos6502 -D__C64__
 SDCCOPT=--max-allocs-per-node 25000 --opt-code-speed
 SDCCDEBUG=--fverbose-asm --i-code-in-asm

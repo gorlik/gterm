@@ -25,7 +25,7 @@
 #include "asc_ctype.h"
 #include "ascii_define.h"
 
-#define VERSION "0.19"
+#define VERSION "0.21"
 
 #define SPR_BASE   (COLOR_BASE+0x3f8)
 
@@ -35,9 +35,11 @@
 #define ACIA_CONTROL ACIA_BASE.control
 #define ACIA_EXT     ACIA_BASE.ext
 
-#ifndef DEF_BAUD_IDX 
+#ifndef DEF_BAUD_IDX
 #define DEF_BAUD_IDX 3
 #endif
+
+//#define DEBUG
 
 unsigned char turbo232, baud_idx_max;
 
@@ -142,7 +144,7 @@ void Scroll(unsigned char l)
   line_addr=line[ctemp1];
 }
 
-void ScrollRegion()
+void ScrollRegion(void)
 {
   Scroll(AM[0]);
   /*  for(ctemp1=AM[0];ctemp1<AM[1];ctemp1++) {
@@ -165,7 +167,7 @@ void InvScroll(unsigned char l)
   line_addr=line[ctemp1];
 }
 
-void InvScrollRegion()
+void InvScrollRegion(void)
 {
   InvScroll(AM[0]);
   /*  for(ctemp1=AM[1];ctemp1>AM[0];ctemp1--) {
@@ -178,7 +180,7 @@ void InvScrollRegion()
 }
 
 
-void set_pos()
+void set_pos(void)
 {
   if(COL>79) {
     if(priv_mode[0]&PRIV_DECAWM) {
@@ -202,7 +204,7 @@ void set_pos()
   line_addr=POS(ROW,COL);
 }
 
-void set_cursor()
+void set_cursor(void)
 {
   itemp=(COL<<2)+24;
   VIC.spr0_x   = ctemp1;
@@ -210,7 +212,7 @@ void set_cursor()
   VIC.spr0_y   = (ROW<<3)+64;
 }
 
-void ser_set()
+void ser_set(void)
 {
   ACIA_CONTROL=baud_table[baud_index].ctrl;
   ACIA_EXT=baud_table[baud_index].ext;
@@ -224,7 +226,7 @@ void ser_set()
   }
 }
 
-void ser_init()
+void ser_init(void)
 {
   unsigned char j;
 
@@ -252,7 +254,7 @@ void ser_init()
   ser_set();
 }
 
-void ser_send()
+void ser_send(void)
 {
   unsigned char st;
   st=ACIA_STATUS;
@@ -263,7 +265,7 @@ void ser_send()
   }
 }
 
-void send_str(unsigned char *str)
+void send_str(const char *str)
 {
   // fixme: check for buffer full
   while(*str) {
@@ -315,23 +317,26 @@ void send_func(unsigned char c)
   }
 }
 
-void conv_str(unsigned char *str)
+#ifdef __SDCC
+// SDCC currently stores strings in ASCII not PETSCII
+// No conversion is needed
+#define conv_str(a) do {} while(0)
+#else
+static void conv_str(unsigned char *str)
 {
   while(*str) {
     *str=conv_table[*str];
     str++;
   }
 }
-
+#endif
 
 unsigned char * line_save;
 unsigned char loc_csave;
 
 void PutTitleAt(unsigned char c)
 {
-#ifndef __SDCC
   conv_str(STR_BUF);
-#endif
   loc_csave=COL;
   line_save=line_addr;
   COL=c;
@@ -343,9 +348,7 @@ void PutTitleAt(unsigned char c)
 
 void PutLineAt(unsigned char r, unsigned char c)
 {
-#ifndef __SDCC
   conv_str(STR_BUF);
-#endif
   loc_csave=COL;
   line_save=line_addr;
   COL=c;
@@ -359,14 +362,14 @@ void PutLineAt(unsigned char r, unsigned char c)
 unsigned char * line_temp;
 unsigned char ctemp;
 
-void title()
+void title(void)
 {
-  sprintf(STR_BUF,"GGLABS GTERM V"VERSION" - %4d00 8N1  ",baud_table[baud_index].baud);
+  sprintf(STR_BUF,"  GGLABS GTERM V"VERSION"     -     http://gglabs.us     -       %4d00 8N1",baud_table[baud_index].baud);
   PutTitleAt(0);
 }
 
 
-void Bitmap_En()
+void Bitmap_En(void)
 {
   VIC.ctrl1=0x3B; // enable bitmap, no extended color, no blank, 25 rows, ypos=3
   //  CIA2.pra=0x00;  // selects VIC page 0xC000-0xFFFF
@@ -377,14 +380,14 @@ void Bitmap_En()
   VIC.ctrl2=0xC8; // no multicolor, 40 cols, xpos=0
 }
 
-void Bitmap_Dis()
+void Bitmap_Dis(void)
 {
   VIC.ctrl1=0x1B; // disable bitmap, no extended color, no blank, 25 rows, ypos=3
   CIA2.pra=0x03;  // selects vic page 0x0000-0x3fff
   VIC.addr=0x15;  // screen base at 0x0400, char def at $0x1400
 }
 
-void Bitmap_Setup()
+void Bitmap_Setup(void)
 {
   line_addr=SCR_BASE;
   ClrLineAddr();
@@ -415,7 +418,7 @@ const void (* const esc_func[7])(void) =
    escape_mode_scs
   };
 
-int main()
+void main(void)
 {
   unsigned char c, cc;
 
@@ -423,14 +426,14 @@ int main()
   printf("GTERM starting\n");
   printf("bitmap at 0x%04X\n",SCR_BASE);
   printf("charset at 0x%04X\n",soft80_charset);
-  printf("conv_table at 0x%04X\n",conv_table);
+  printf("conv table at 0x%04X\n",conv_table);
   printf("isxx table at 0x%04X\n",isxx);
   cgetc();
 #endif
   
   Bitmap_Setup();
   Bitmap_En();
-  
+
   ser_init();
   // setup the NMI vector
   *((unsigned int *)0x0318)=(unsigned int)NMI;
@@ -471,7 +474,7 @@ int main()
   PutLineAt(0,0);
   sprintf(STR_BUF,"A modern VT100 terminal emulator for the Commodore 64");
   PutLineAt(1,0);
-  sprintf(STR_BUF,"Copyright (c) 2019-2022 Gabriele Gorla");
+  sprintf(STR_BUF,"Copyright (c) 2019-2026 Gabriele Gorla");
   PutLineAt(2,0);
   
   sprintf(STR_BUF,"This program is free software: you can redistribute it and/or modify it under");
@@ -621,7 +624,7 @@ int main()
     //    if(c=='q') break;
   } // main loop
   
-  Bitmap_Dis();
+//  Bitmap_Dis();
   
-  return 0;
+//  return 0;
 }

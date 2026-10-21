@@ -22,6 +22,7 @@
 #include <c64.h>
 
 #include "gterm.h"
+#include "ascii_define.h"
 #include "asc_ctype.h"
 
 #define EP_MAX 8
@@ -35,6 +36,8 @@ unsigned char g_set;
 
 //#define VT102
 
+//#define DEBUG
+
 #ifdef ESC_DEBUG
 void debug_char(unsigned char w)
 {
@@ -45,7 +48,7 @@ void debug_char(unsigned char w)
 }
 #endif
 
-void parse_control()
+void parse_control(void)
 {
   switch(c1) {
   case 0x00: // NULL
@@ -74,7 +77,7 @@ void parse_control()
     } else COL=79;
 #ifdef TAB_DEBUG
     sprintf(STR_BUF,"TAB %02d",COL);
-    PutTitleAt(34);
+    PutTitleAt(20);
     sprintf(STR_BUF,"T %02x %02x %02x %02x %02x %02x ",tab[0],tab[1],
 	    tab[2],tab[3],tab[4],tab[5]);
     PutTitleAt(48);
@@ -86,7 +89,7 @@ void parse_control()
   case 0x0B: // VTAB
   case 0x0C: // Form Feed
     #ifndef ESC_DEBUG
-    //    sprintf(STR_BUF,"LF %02d %02d L %02d %02d",ROW,COL,AM[0],AM[1]);
+        //    sprintf(STR_BUF,"LF %02d %02d L %02d %02d",ROW,COL,AM[0],AM[1]);
     //    PutTitleAt(40);
     if(ROW>=AM[1]) Scroll1();
     else ++ROW;
@@ -110,11 +113,9 @@ void parse_control()
   case 0x1B: // ESCAPE
 #ifndef ESC_DEBUG
     esc_mode=1;
-//    sprintf(STR_BUF,"S %02X %02x %02x P %02d %02d",attr,priv_mode[0],priv_mode[1],ROW,COL);
-//    PutTitleAt(34);
 #else
     sprintf(STR_BUF,"S %02X %02x %02x P %02d %02d",attr,priv_mode[0],priv_mode[1],ROW,COL);
-    PutTitleAt(34);
+    PutTitleAt(20);
     debug_char('^');
 #endif
     break;
@@ -127,7 +128,7 @@ void parse_control()
   }
 }
 
-void escape_mode_imm()
+void escape_mode_imm(void)
 {
   esc_mode=0; 
   switch(c1) {
@@ -286,7 +287,7 @@ void delete_char(unsigned char c)
 }
 #endif
 
-void escape_mode_csi()
+void escape_mode_csi(void)
 {
   unsigned char i;
   
@@ -523,22 +524,22 @@ void escape_mode_csi()
 	break;
 
 #ifdef ANSI
-      case 0x73: // 's' - save cusor pos
+      case ASCII_s: // 0x73 's' - save cusor pos
 	col_save=COL;
 	row_save=ROW;
 	break;
 
-      case 0x74: // 't'
+      case ASCII_t: // 0x74 't'
 	if(e[0]==1) attr=1;
 	break;
 
-      case 0x75: // 'u' - restore cursor pos
+      case ASCII_u: // 0x75 'u' - restore cursor pos
 	COL=col_save;
 	ROW=row_save;
 	break;
 #endif
 #if 0
-      case 0x78: // 'x' - DECREPTPARM
+      case ASCII_x: // 0x78 'x' - DECREPTPARM
 	// VT100 only - removed in VT102
 	break;
 #endif	
@@ -554,7 +555,7 @@ void escape_mode_csi()
     } else parse_control(); 
 }
 
-void escape_mode_hash()
+void escape_mode_hash(void)
 {
   static unsigned char x;
   
@@ -562,7 +563,7 @@ void escape_mode_hash()
   // should parse for sequence '8' - fill screen with 'E'
   switch(c1) {
   case '8':
-    for(x=0;x<80;x++) STR_BUF[x]=conv_table['E'];
+    for(x=0;x<80;x++) STR_BUF[x]=ASCII_E;
     for(x=0;x<24;x++) {
       COL=0;
       line_addr=line[x];
@@ -575,7 +576,7 @@ void escape_mode_hash()
   esc_mode=0;
 }
 
-void escape_mode_priv()
+void escape_mode_priv(void)
 {
   unsigned char i;
   
@@ -584,8 +585,8 @@ void escape_mode_priv()
   else if(c1==0x3B) ep++; // ';' separator 
   else if(isprint(c1)) {
     switch(c1) {
-    case 0x68: // 'h' set param
-    case 0x6C: // 'l' reset param
+    case ASCII_h: // 0x68 'h' set param
+    case ASCII_l: // 0x6c 'l' reset param
       for(i=0;i<ep+1;i++) {
 	switch(e[i]) {
 	case 1: // DECCKM 
@@ -668,22 +669,22 @@ void escape_mode_priv()
   }
 }
 
-void escape_mode_scs()
+void escape_mode_scs(void)
 {
     switch(c1) {
-    case 0x30: // '0'
+    case ASCII_0: // 0x30 '0'
       G[g_set]=CHAR_GRP;
       break;
-    case 0x31: // '1'
+    case ASCII_1: // 0x31 '1'
       G[g_set]=CHAR_ALT;
       break;
-    case 0x32: // '2'
+    case ASCII_2: // 0x32 '2'
       G[g_set]=CHAR_ALT_GR;
       break;
-    case 0x41: // 'A'
+    case ASCII_A: // 0x41 'A'
       G[g_set]=CHAR_UK;
       break;
-    case 0x42: // 'B'
+    case ASCII_B: // 0x42 'B'
       G[g_set]=CHAR_US;
       break;      
       default:

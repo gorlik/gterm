@@ -1,7 +1,7 @@
 all: c64
 # c128
 
-SERIAL=/dev/ttyUSB4
+SERIAL=/dev/ttyUSB3
 ACIACONFIG= -acia1 -acia1mode 2 -acia1irq 1 -acia1base 0xde00 -rsdev1baud 38400 -rsdev2 $(SERIAL)
 
 
