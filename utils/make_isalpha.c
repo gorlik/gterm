@@ -5,7 +5,8 @@ int main()
 {
   int i;
   unsigned char c;
-  
+
+  printf("/* table to support ascii isxx() */\n");
   printf("const unsigned char isxx[256] = {\n");
 
   for(i=0;i<256;i++) {
@@ -21,12 +22,10 @@ int main()
     // generate isdecgfx
     if( (i>0x5E) && (i<0x7F) ) c|=0x40;
 
-    
-    printf("0x%02X", c);
-    if((i+1)&0x0f) printf(", ");
-    else printf(",\n");
+    printf("0x%02X, ", c);
+    if((i+1)%16==0) printf("\n");
   }
-  printf("};\n");
+  printf("};\n\n");
 
   return 0;
 }

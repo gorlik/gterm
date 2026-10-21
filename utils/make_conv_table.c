@@ -254,7 +254,9 @@ int main(int argc, char *argv[])
       printf("/* char_tables.c */\n");
       printf("/* PETSCII to ASCII */\n\n");
 
-      printf("#pragma rodata-name (\"TABLES\")\n\n");
+      printf("#ifndef __SDCC\n");
+      printf("#pragma rodata-name (\"TABLES\")\n");
+      printf("#endif\n\n");
 
       printf("const unsigned char conv_table[256] = {\n");
       for(i=0;i<256;i++) {

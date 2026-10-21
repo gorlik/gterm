@@ -19,7 +19,9 @@ int main(int argc, char *argv[])
   printf("/* soft80_font.c */\n\n");
 
 
-  printf("#pragma rodata-name (\"TABLES\")\n\n");
+  printf("#ifndef __SDCC\n");
+  printf("#pragma rodata-name (\"TABLES\")\n");
+  printf("#endif\n\n");
 
   printf("const unsigned char soft80_charset[2048] = {\n");
 
