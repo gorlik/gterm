@@ -1,7 +1,7 @@
 /******************************************************************************
  *  GTERM - GGLABS TERMINAL                                                   *
  *  A fast 80 columns terminal for the C64                                    *
- *  Copyright 2019-2022 Gabriele Gorla                                        *
+ *  Copyright 2019-2026 Gabriele Gorla                                        *
  *                                                                            *
  *  This program is free software: you can redistribute it and/or modify      *
  *  it under the terms of the GNU General Public License as published by      *
@@ -206,9 +206,10 @@ void set_pos(void)
 
 void set_cursor(void)
 {
-  itemp=(COL<<2)+24;
-  VIC.spr0_x   = ctemp1;
-  VIC.spr_hi_x = ctemp2;
+  unsigned int i;
+  i = (COL<<2)+24;
+  VIC.spr0_x   = i&0xff;
+  VIC.spr_hi_x = i>>8;
   VIC.spr0_y   = (ROW<<3)+64;
 }
 

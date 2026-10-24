@@ -26,10 +26,8 @@
 #endif
 
 // zero page variables
-#define itemp_ptr    0xA3
-#define itemp        (*((unsigned int *)  itemp_ptr))
-#define ctemp1       (*((unsigned char *) itemp_ptr))
-#define ctemp2       (*((unsigned char *) (itemp_ptr+1) ))
+#define ctemp1_ptr    0xA3
+#define ctemp1       (*((unsigned char *) ctemp1_ptr))
 
 #define POS(r,c)     (line[r]+((c>>1)<<3))
 
