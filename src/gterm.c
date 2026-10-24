@@ -267,9 +267,13 @@ void ser_send(void)
 
 void send_str(const char *str)
 {
-  // fixme: check for buffer full
+  // FIXME: check for buffer full
   while(*str) {
+#ifdef __SDCC
+    send_buf[send_put]=*str;
+#else
     send_buf[send_put]=conv_table[*str];
+#endif
     str++;
     send_put++;
     send_put&=0x1F;
