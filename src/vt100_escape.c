@@ -34,6 +34,9 @@ unsigned char G_s[2];
 
 unsigned char g_set;
 
+const unsigned char shift[8] =
+  { 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80 };
+
 //#define VT102
 
 //#define DEBUG
@@ -71,7 +74,7 @@ void parse_control(void)
   case 0x09: // HTAB
     if(COL<78) {
       for(ctemp1=COL+1;ctemp1<79;ctemp1++) {
-	if(tab[ctemp1>>3]&(1<<(ctemp1&0x7))) break;
+	if(tab[ctemp1>>3]&shift[ctemp1&0x7]) break;
       }
       COL=ctemp1;
     } else COL=79;
