@@ -58,7 +58,7 @@
 	lda #$01		; 2
 	sta ACIA_COMMAND	; 4
 	lda #$05		; 2
-	sta _SCR_BASE-$400+38	; 4 - on screen receive "led"
+	sta _COLOR_BASE+38	; 4 - on screen receive "led"
 
 	;; return from interrupt
 end_nmi:
@@ -88,7 +88,7 @@ end_nmi:
 set_rts:
 	;; set RTS
 	lda #$01		; 2
-	sta _SCR_BASE-$400+38	; 4
+	sta _COLOR_BASE+38	; 4
 	lda #$0B		; 2
 	sta ACIA_COMMAND	; 4
 
@@ -123,7 +123,7 @@ last:
 	lda #$03		; 2
 	sta ACIA_COMMAND	; 4
 	lda #$05		; 2
-	sta _SCR_BASE-$400+38
+	sta _COLOR_BASE+38
 
 	;; check if one more char in the buffer
 	lda ACIA_STATUS 	; 4

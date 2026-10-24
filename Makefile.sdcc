@@ -37,7 +37,6 @@ char_tables.rel: char_tables.c
 soft80-font.rel: soft80-font.c
 	$(SDCC) $(CFLAGS) --constseg TABLES -c -o $@ $<
 
-
 %.bin: %.rel $(OBJECTS)
 	$(SDCC) $(LDFLAGS) $(CART) $(LIBS) $(OBJECTS) -Wl-aTABLES=0xb600 $< -o $@.ihx
 	$(MAKEBIN) -o 0x8000 -s 0xc000 $@.ihx $@

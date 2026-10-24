@@ -63,44 +63,43 @@ unsigned char baud_index; // current baud rate
 unsigned char col_save, row_save, attr_save;
 
 unsigned char * const line[] = {
-		       //			SCR_BASE+0,
-			SCR_BASE+320*1,
-			SCR_BASE+320*2,
-			SCR_BASE+320*3,
-			SCR_BASE+320*4,
-			SCR_BASE+320*5,
-			SCR_BASE+320*6,
-			SCR_BASE+320*7,
-			SCR_BASE+320*8,
-			SCR_BASE+320*9,
-			SCR_BASE+320*10,
-			SCR_BASE+320*11,
-			SCR_BASE+320*12,
-			SCR_BASE+320*13,
-			SCR_BASE+320*14,
-			SCR_BASE+320*15,
-			SCR_BASE+320*16,
-			SCR_BASE+320*17,
-			SCR_BASE+320*18,
-			SCR_BASE+320*19,
-			SCR_BASE+320*20,
-			SCR_BASE+320*21,
-			SCR_BASE+320*22,
-			SCR_BASE+320*23,
-			SCR_BASE+320*24,
+  // SCR_BASE+320*0,  // title line is not part of the usable screen
+  SCR_BASE+320*1,
+  SCR_BASE+320*2,
+  SCR_BASE+320*3,
+  SCR_BASE+320*4,
+  SCR_BASE+320*5,
+  SCR_BASE+320*6,
+  SCR_BASE+320*7,
+  SCR_BASE+320*8,
+  SCR_BASE+320*9,
+  SCR_BASE+320*10,
+  SCR_BASE+320*11,
+  SCR_BASE+320*12,
+  SCR_BASE+320*13,
+  SCR_BASE+320*14,
+  SCR_BASE+320*15,
+  SCR_BASE+320*16,
+  SCR_BASE+320*17,
+  SCR_BASE+320*18,
+  SCR_BASE+320*19,
+  SCR_BASE+320*20,
+  SCR_BASE+320*21,
+  SCR_BASE+320*22,
+  SCR_BASE+320*23,
+  SCR_BASE+320*24,
 };
 
 
-const struct baud_table_t baud_table[] =
-  {
-   {   24, 0x18, 0x00 },
-   {   96, 0x1C, 0x00 },
-   {  192, 0x1E, 0x00 },
-   {  384, 0x1F, 0x00 },
-   {  576, 0x10, 0x02 | BT_EXT_TURBO },
-   { 1152, 0x10, 0x01 | BT_EXT_TURBO | BT_EXT_POLL },
-   //   { 2304, 0x10, 0x00 | BT_EXT_TURBO | BT_EXT_POLL },
-  };
+const struct baud_table_t baud_table[] = {
+  {   24, 0x18, 0x00 },
+  {   96, 0x1C, 0x00 },
+  {  192, 0x1E, 0x00 },
+  {  384, 0x1F, 0x00 },
+  {  576, 0x10, 0x02 | BT_EXT_TURBO },
+  { 1152, 0x10, 0x01 | BT_EXT_TURBO | BT_EXT_POLL },
+  //   { 2304, 0x10, 0x00 | BT_EXT_TURBO | BT_EXT_POLL },
+};
 
 #define BAUD_TABLE_SIZE (sizeof(baud_table)/sizeof(struct baud_table_t))
 
@@ -551,7 +550,7 @@ void main(void)
       } else {
 	// release RTS
 	ACIA_COMMAND=0x09;
-	*(char *)(SCR_BASE-0x400+38)=1;
+	*(COLOR_BASE+38)=1;
       }
     } 
 

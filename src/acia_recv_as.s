@@ -1,7 +1,7 @@
 ;******************************************************************************
 ;*  GTERM - GGLABS TERMINAL                                                   *
 ;*  A fast 80 columns terminal for the C64                                    *
-;*  Copyright 2022 Gabriele Gorla                                             *
+;*  Copyright 2022-2026 Gabriele Gorla                                        *
 ;*                                                                            *
 ;*  This program is free software: you can redistribute it and/or modify      *
 ;*  it under the terms of the GNU General Public License as published by      *
@@ -29,6 +29,7 @@
 .globl _STR_BUF
 .globl ACIA_COMMAND
 .globl _SCR_BASE
+.globl _COLOR_BASE
 
 _SER_BUF    = 0xC800
 _STR_BUF    = 0xC900
@@ -76,7 +77,7 @@ _NMI:
 	lda #0x01		; 2
 	sta ACIA_COMMAND	; 4
 	lda #0x05		; 2 
-	sta _SCR_BASE-0x400+38	; 4 - on screen receive "led"
+	sta _COLOR_BASE+38	; 4 - on screen receive "led"
 
 	;; return from interrupt
 end_nmi:
@@ -106,7 +107,7 @@ _ser_recv:
 set_rts:
 	;; set RTS
 	lda #$01		; 2
-	sta _SCR_BASE-$400+38	; 4
+	sta _COLOR_BASE+38	; 4
 	lda #$0B		; 2
 	sta ACIA_COMMAND	; 4
 
@@ -141,7 +142,7 @@ last:
 	lda #$03		; 2
 	sta ACIA_COMMAND	; 4
 	lda #$05		; 2
-	sta _SCR_BASE-$400+38
+	sta _COLOR_BASE+38
 
 	;; check if one more char in the buffer
 	lda ACIA_STATUS 	; 4

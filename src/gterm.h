@@ -161,7 +161,7 @@ extern unsigned char SPR_DATA[];   // cursor sprite
 
 extern volatile struct acia_t ACIA_BASE;
 
-extern const char soft80_charset[]; // soft80 font
+extern const unsigned char soft80_charset[]; // soft80 font
 extern const char conv_table[256];  // petscii to ascii
 extern unsigned char * const line[];           // precomputed line address
 

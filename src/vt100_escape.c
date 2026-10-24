@@ -34,7 +34,7 @@ unsigned char G_s[2];
 
 unsigned char g_set;
 
-const unsigned char shift[8] =
+static const unsigned char shift[8] =
   { 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80 };
 
 //#define VT102
