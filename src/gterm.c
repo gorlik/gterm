@@ -344,7 +344,7 @@ void PutTitleAt(unsigned char c)
   loc_csave=COL;
   line_save=line_addr;
   COL=c;
-  line_addr=SCR_BASE+((c>>1)<<3);
+  line_addr=SCR_BASE+((c&0xfe)<<2);
   PutLine();
   line_addr=line_save;
   COL=loc_csave;

@@ -29,7 +29,7 @@
 #define ctemp1_ptr    0xA3
 #define ctemp1       (*((unsigned char *) ctemp1_ptr))
 
-#define POS(r,c)     (line[r]+((c>>1)<<3))
+#define POS(r,c)     (line[r]+((c&0xfe)<<2))
 
 // priv_mode defines
 #define PRIV_DECCKM  0x01  // cursor key
