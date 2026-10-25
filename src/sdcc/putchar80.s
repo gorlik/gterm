@@ -29,42 +29,14 @@
 
 .globl _attr
 .globl _c1, _c2
+.globl t1, t2
 .globl _ROW, _COL
-.globl _line_addr
+.globl _dst_addr
 .globl _STR_BUF
 .globl _SCR_BASE
 .globl _COLOR_BASE
 .globl _SPR_DATA
 
-	_SCR_BASE = 0x6000
-	_COLOR_BASE = _SCR_BASE-0x400
-        _SPR_DATA   = _COLOR_BASE-64
-
-
-.area ZP
-_SRC_LINE::
-t1:
-	.db 1
-t2:
-	.db 1
-_line_addr::
-	.db 1
-	.db 1
-_c1::
-	.db 1
-_c2::
-	.db 1
-_get::
-	.db 1
-_put::
-	.db 1
-_ROW::
-	.db 1
-_COL::
-	.db 1
-_ctemp1::
-	.db 1
-	
 .area CODE
 
 ;//CHAR_E = _soft80_charset
@@ -95,11 +67,11 @@ _PutChar80:
 even_skip:
 	cline = 0
 .rept 7
-	lda [_line_addr],y
+	lda [_dst_addr],y
 	and #0x0F
 	ora _soft80_charset+cline*128,x	;
 	eor *t2
-	sta [_line_addr],y
+	sta [_dst_addr],y
 	iny
 	cline = cline + 1
 .endm
@@ -108,18 +80,18 @@ even_skip:
 	beq skip_underline_e
 ;; replace line 6 with underline
 	dey
-	lda [_line_addr],y
+	lda [_dst_addr],y
 	and #0x0F
 	ora #0xF0
 	eor *t2
-	sta [_line_addr],y
+	sta [_dst_addr],y
 	iny
 skip_underline_e:	
-	lda [_line_addr],y
+	lda [_dst_addr],y
 	and #0x0F
 	ora _soft80_charset+7*128,x	;
 	eor *t2
-	sta [_line_addr],y
+	sta [_dst_addr],y
 	rts 			;
 	
 odd:
@@ -129,11 +101,11 @@ odd:
 odd_skip:
 	cline = 0
 .rept 7
-	lda [_line_addr],y
+	lda [_dst_addr],y
 	and #0xF0
 	ora _soft80_charset+0x400+cline*128,x	;
 	eor *t2
-	sta [_line_addr],y
+	sta [_dst_addr],y
 	iny
 	cline = cline + 1
 .endm
@@ -142,26 +114,26 @@ odd_skip:
 	beq skip_underline_o
 ;; replace line 6 with underline
 	dey
-	lda [_line_addr],y
+	lda [_dst_addr],y
 	and #0xF0
 	ora #0x0F
 	eor *t2
-	sta [_line_addr],y
+	sta [_dst_addr],y
 	iny
 skip_underline_o:	
-	lda [_line_addr],y
+	lda [_dst_addr],y
 	and #0xF0
 	ora _soft80_charset+0x400+7*128,x	;
 	eor *t2
-	sta [_line_addr],y
+	sta [_dst_addr],y
 line_add:	
-	lda *_line_addr
+	lda *_dst_addr
 	clc
 	adc #0x08
 	bne no_carry_pc
-	inc *_line_addr+1
+	inc *_dst_addr+1
 no_carry_pc:
-	sta *_line_addr
+	sta *_dst_addr
 ;//end2:	
 	rts
 
@@ -182,7 +154,7 @@ _Put2Char80:
 	lda _soft80_charset+cline*128,x
 	ldx *_c2
 	ora _soft80_charset+0x400+cline*128,x
-	sta [_line_addr],y
+	sta [_dst_addr],y
 	iny
 	cline = cline + 1
 .endm
@@ -190,13 +162,13 @@ _Put2Char80:
 p2c_end:	
 	inc *_COL
 	inc *_COL
-	lda *_line_addr
+	lda *_dst_addr
 	clc
 	adc #0x08
 	bne no_carry_p2c
-	inc *_line_addr+1
+	inc *_dst_addr+1
 no_carry_p2c:
-	sta *_line_addr
+	sta *_dst_addr
 	rts
 
 ;  generic version (reverse and underline support)
@@ -215,7 +187,7 @@ iskip:
 	ldx *_c2
 	ora _soft80_charset+0x400+cline*128,x
 	eor *t2
-	sta [_line_addr],y
+	sta [_dst_addr],y
 	iny
 	cline = cline + 1
 .endm
@@ -228,13 +200,13 @@ iskip:
 	ldx *_c2
 	ora _soft80_charset+0x400+6*128,x
 	eor *t2
-	sta [_line_addr],y
+	sta [_dst_addr],y
 	iny
 	bne iter7
 underline:
 	lda #0xFF
 	eor *t2
-	sta [_line_addr],y
+	sta [_dst_addr],y
 	iny
 	;; iteration 7
 iter7:	
@@ -243,7 +215,7 @@ iter7:
 	ldx *_c2
 	ora _soft80_charset+0x400+7*128,x
 	eor *t2
-	sta [_line_addr],y
+	sta [_dst_addr],y
 	;	iny
 	jmp p2c_end
 
@@ -294,9 +266,9 @@ _ClrTo:
 	beq clr_end
 	ldy #0x00
 .rept 8
-	lda [_line_addr],y
+	lda [_dst_addr],y
 	and #0x0F
-	sta [_line_addr],y
+	sta [_dst_addr],y
 	iny
 .endm
 clr_end:
@@ -309,19 +281,19 @@ _ClrFrom:
 	and #0x01
 	beq skip_clr
 .rept 8
-	lda [_line_addr],y
+	lda [_dst_addr],y
 	and #0xF0
-	sta [_line_addr],y
+	sta [_dst_addr],y
 	iny
 .endm
 
-	lda *_line_addr
+	lda *_dst_addr
 	clc
 	adc #0x08
 	bne no_carry_clr
-	inc *_line_addr+1
+	inc *_dst_addr+1
 no_carry_clr:
-	sta *_line_addr
+	sta *_dst_addr
 
 skip_clr:
 	clc
@@ -341,16 +313,16 @@ _Put2Blank:
 loop:	lda #0x00
 	ldy #0x00
 .rept 8
-	sta [_line_addr],y
+	sta [_dst_addr],y
 	iny
 .endm
-	lda *_line_addr
+	lda *_dst_addr
 	clc
 	adc #0x08
 	bne no_carry_p2b
-	inc *_line_addr+1
+	inc *_dst_addr+1
 no_carry_p2b:
-	sta *_line_addr
+	sta *_dst_addr
 	dex
 	bne loop
 end:	

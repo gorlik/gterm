@@ -28,12 +28,6 @@ CHAR_O=(_soft80_charset+$400)
 .export _ClrTo
 .export _ClrFrom	
 
-.segment "ZP_2" : zeropage
-t1:
-	.res 1
-t2:
-	.res 1
-	
 .segment	"CODE"
 
 ; ****************** PutChar *********************
@@ -59,11 +53,11 @@ t2:
 	sta t2
 even_skip:	
 .repeat 7,cline
-	lda (_line_addr),y
+	lda (_dst_addr),y
 	and #$0F
 	ora CHAR_E+cline*128,x	;
 	eor t2
-	sta (_line_addr),y
+	sta (_dst_addr),y
 	iny
 .endrepeat
 	lda _attr
@@ -71,18 +65,18 @@ even_skip:
 	beq skip_underline_e
 ;; replace line 6 with underline
 	dey
-	lda (_line_addr),y
+	lda (_dst_addr),y
 	and #$0F
 	ora #$F0
 	eor t2
-	sta (_line_addr),y
+	sta (_dst_addr),y
 	iny
 skip_underline_e:	
-	lda (_line_addr),y
+	lda (_dst_addr),y
 	and #$0F
 	ora CHAR_E+7*128,x	;
 	eor t2
-	sta (_line_addr),y
+	sta (_dst_addr),y
 	rts 			;
 	
 odd:
@@ -91,11 +85,11 @@ odd:
 	sta t2
 odd_skip:	
 .repeat 7,cline
-	lda (_line_addr),y
+	lda (_dst_addr),y
 	and #$F0
 	ora CHAR_O+cline*128,x	;
 	eor t2
-	sta (_line_addr),y
+	sta (_dst_addr),y
 	iny
 .endrepeat
 	lda _attr
@@ -103,26 +97,26 @@ odd_skip:
 	beq skip_underline_o
 ;; replace line 6 with underline
 	dey
-	lda (_line_addr),y
+	lda (_dst_addr),y
 	and #$F0
 	ora #$0F
 	eor t2
-	sta (_line_addr),y
+	sta (_dst_addr),y
 	iny
 skip_underline_o:	
-	lda (_line_addr),y
+	lda (_dst_addr),y
 	and #$F0
 	ora CHAR_O+7*128,x	;
 	eor t2
-	sta (_line_addr),y
+	sta (_dst_addr),y
 line_add:	
-	lda _line_addr
+	lda _dst_addr
 	clc
 	adc #$08
 	bne no_carry
-	inc _line_addr+1
+	inc _dst_addr+1
 no_carry:
-	sta _line_addr
+	sta _dst_addr
 end2:	
 	rts
 .endproc
@@ -144,19 +138,19 @@ end2:
 	lda CHAR_E+cline*128,x
 	ldx _c2
 	ora CHAR_O+cline*128,x
-	sta (_line_addr),y
+	sta (_dst_addr),y
 	iny
 .endrepeat
 end:	
 	inc _COL
 	inc _COL
-	lda _line_addr
+	lda _dst_addr
 	clc
 	adc #$08
 	bne no_carry2
-	inc _line_addr+1
+	inc _dst_addr+1
 no_carry2:
-	sta _line_addr
+	sta _dst_addr
 	rts
 
 ;  generic version (reverse and underline support)
@@ -174,7 +168,7 @@ iskip:
 	ldx _c2
 	ora CHAR_O+cline*128,x
 	eor t2
-	sta (_line_addr),y
+	sta (_dst_addr),y
 	iny
 .endrepeat
 	;; iteration 6
@@ -186,13 +180,13 @@ iskip:
 	ldx _c2
 	ora CHAR_O+6*128,x
 	eor t2
-	sta (_line_addr),y
+	sta (_dst_addr),y
 	iny
 	bne iter7
 underline:
 	lda #$FF
 	eor t2
-	sta (_line_addr),y
+	sta (_dst_addr),y
 	iny
 	;; iteration 7
 iter7:	
@@ -201,7 +195,7 @@ iter7:
 	ldx _c2
 	ora CHAR_O+7*128,x
 	eor t2
-	sta (_line_addr),y
+	sta (_dst_addr),y
 	;	iny
 	jmp end
 
@@ -254,9 +248,9 @@ end:
 	beq end
 	ldy #$00
 .repeat 8,cline
-	lda (_line_addr),y
+	lda (_dst_addr),y
 	and #$0F
-	sta (_line_addr),y
+	sta (_dst_addr),y
 	iny
 .endrepeat
 end:
@@ -271,19 +265,19 @@ end:
 	and #$01
 	beq skip
 .repeat 8,cline
-	lda (_line_addr),y
+	lda (_dst_addr),y
 	and #$F0
-	sta (_line_addr),y
+	sta (_dst_addr),y
 	iny
 .endrepeat
 
-	lda _line_addr
+	lda _dst_addr
 	clc
 	adc #$08
 	bne no_carry
-	inc _line_addr+1
+	inc _dst_addr+1
 no_carry:
-	sta _line_addr
+	sta _dst_addr
 
 skip:
 	clc
@@ -304,16 +298,16 @@ skip:
 loop:	lda #$00
 	ldy #$00
 .repeat 8,cline
-	sta (_line_addr),y
+	sta (_dst_addr),y
 	iny
 .endrepeat
-	lda _line_addr
+	lda _dst_addr
 	clc
 	adc #$08
 	bne no_carry
-	inc _line_addr+1
+	inc _dst_addr+1
 no_carry:
-	sta _line_addr
+	sta _dst_addr
 	dex
 	bne loop
 end:	

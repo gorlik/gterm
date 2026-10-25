@@ -74,10 +74,10 @@ void parse_control(void)
     
   case ASCII_HT: // 0x09 HTAB
     if(COL<78) {
-      for(ctemp1=COL+1;ctemp1<79;ctemp1++) {
-	if(tab[ctemp1>>3]&shift[ctemp1&0x7]) break;
+      for(zptemp=COL+1;zptemp<79;zptemp++) {
+	if(tab[zptemp>>3]&shift[zptemp&0x7]) break;
       }
-      COL=ctemp1;
+      COL=zptemp;
     } else COL=79;
 #ifdef TAB_DEBUG
     sprintf(STR_BUF,"TAB %02d",COL);
@@ -138,7 +138,7 @@ void escape_mode_imm(void)
   switch(c1) {
   case ASCII_BRACKET_OPEN:  // 0x5B '['
     esc_mode=2; 
-    for(ctemp1=0;ctemp1<EP_MAX;ctemp1++) e[ctemp1]=0;
+    for(zptemp=0;zptemp<EP_MAX;zptemp++) e[zptemp]=0;
     ep=0;
     break;
   case ASCII_7: // 0x37 '7' DECSC save cursor
@@ -358,12 +358,12 @@ void escape_mode_csi(void)
 	break;
 
       case ASCII_J: // 0x4A 'J' ED erase display
-	//	line_addr=POS(ROW,COL);
+	//	dst_addr=POS(ROW,COL);
 	switch(e[0]) {
 	case 1: // erase lines to cursor position
 	  for(i=0;i<ROW;i++)
 	    ClrLine(i);
-	  line_addr=line[ROW];
+	  dst_addr=line[ROW];
 	  ClrTo();
 	  break;
 	case 2: // erase all screen
@@ -372,30 +372,30 @@ void escape_mode_csi(void)
 	  // Cursor position should not change
 	  break;
 	default: // erase from cursor
-	  line_addr=POS(ROW,COL);
+	  dst_addr=POS(ROW,COL);
 	  ClrFrom();
 	  for(i=ROW+1;i<24;i++)
 	    ClrLine(i);
 	  break;
 	}
-	line_addr=POS(ROW,COL);
+	dst_addr=POS(ROW,COL);
 	break;
 	
       case ASCII_K: // 0x4B 'K' EL erase line
 	switch(e[0]) {
 	case 1: // erase line to cursor
-	  line_addr=line[ROW];
+	  dst_addr=line[ROW];
 	  ClrTo();
 	  break;
 	case 2: // erase all line
 	  ClrLine(ROW);
 	  break;
 	default: // erase line from cursor
-	  line_addr=POS(ROW,COL);
+	  dst_addr=POS(ROW,COL);
 	  ClrFrom();
 	  break;
 	}
-	line_addr=POS(ROW,COL);
+	dst_addr=POS(ROW,COL);
 //	set_cursor();
 	break;
 #ifdef VT102
@@ -418,10 +418,10 @@ void escape_mode_csi(void)
 	delete_char(e[0]);
 	ctemp=COL;
 	COL=80-e[0];
-	line_addr=POS(ROW,80-e[0]);
+	dst_addr=POS(ROW,80-e[0]);
 	ClrFrom();
 	COL=ctemp;
-	line_addr=POS(ROW,COL);
+	dst_addr=POS(ROW,COL);
 	//	for(i=1;i<e[0];i++) delete_char(1);
 	break;	
 #endif
@@ -469,8 +469,8 @@ void escape_mode_csi(void)
 #endif
       case ASCII_g: // 0x67 'g' TBC tab clear
 	if(e[0]==3) {
-	for(ctemp1=0;ctemp1<10;++ctemp1)
-	  tab[ctemp1]=0;
+	for(zptemp=0;zptemp<10;++zptemp)
+	  tab[zptemp]=0;
 	} else {
 	  if((e[0]==0) && (COL<80))
 	    tab[COL>>3]&=~(1<<(COL&0x7));
@@ -513,7 +513,7 @@ void escape_mode_csi(void)
 	COL=0;
 	ROW=(priv_mode[0]&PRIV_DECOM)?AM[0]:0;
 	  
-	line_addr=line[ROW];
+	dst_addr=line[ROW];
 	if((AM[0]==0) && (AM[1]==23)) {
 	  Scroll1=FS_Scroll1;
 	  InvScroll1=FS_InvScroll1; 
@@ -570,7 +570,7 @@ void escape_mode_hash(void)
     for(x=0;x<80;x++) STR_BUF[x]=ASCII_E;
     for(x=0;x<24;x++) {
       COL=0;
-      line_addr=line[x];
+      dst_addr=line[x];
       PutLine();
     }
     break;
@@ -606,7 +606,7 @@ void escape_mode_priv(void)
 	  // standard VT100 docs say screen should be cleared on mode switch
 	  ClrScr();
 	  ROW=0; COL=0;
-	  line_addr=line[0];
+	  dst_addr=line[0];
 	  break;
 	case 4: // DECSCLM smooth scroll
 	  if(c1==ASCII_h) priv_mode[1]|=PRIV_DECSCLM;
@@ -632,7 +632,7 @@ void escape_mode_priv(void)
 	    ROW=0;
 	  }
 	  COL=0;
-	  line_addr=line[ROW];
+	  dst_addr=line[ROW];
 #ifdef DEBUG
 	  sprintf(STR_BUF,"%02d %02d %c ",AM[0],AM[1],(priv_mode[0]&PRIV_DECOM)?'E':'D');
 	  PutTitleAt(64);

@@ -9,7 +9,7 @@ SDCCOPT=--max-allocs-per-node 25000 --opt-code-speed
 SDCCDEBUG=--fverbose-asm --i-code-in-asm
 SDKINC = -I $(SDKROOT)/include
 
-VPATH=../src
+VPATH=../src:../src/sdcc
 INCLUDE=../src
 SYS_INCLUDE=../src
 CART = --code-loc 0x8000 --xram-loc 0x1000 --data-loc 0x0002 $(SDKROOT)/lib/c64_cart_crt0.rel
@@ -21,10 +21,10 @@ LDFLAGS = -L $(SDKROOT)/lib --out-fmt-ihx -mmos6502 --no-std-crt0
 
 CFLAGS += -I. -I$(INCLUDE) -I$(SYS_INCLUDE)
 
-OBJECTS=  vt100_escape.rel acia_recv_as.rel putchar80_as.rel scroll_as.rel \
-	char_tables.rel soft80-font.rel
+OBJECTS=  vt100_escape.rel acia_recv.rel putchar80.rel scroll.rel \
+	variables.rel char_tables.rel soft80-font.rel
 
-gterm.bin:
+gterm.bin: $(OBJECTS)
 
 clean:
 	rm -f *.ihx *.rel *.map *.noi *.asm *.lk *.sym *.lst

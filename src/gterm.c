@@ -103,6 +103,11 @@ const struct baud_table_t baud_table[] = {
 
 #define BAUD_TABLE_SIZE (sizeof(baud_table)/sizeof(struct baud_table_t))
 
+const static unsigned char F_conv[] = {
+   ASCII_P, ASCII_Q, ASCII_R, ASCII_S, ASCII_t, ASCII_u, ASCII_v, ASCII_l,
+   ASCII_w, ASCII_x, 0,       0,       0,       0,       0,       0, // need to fix F9-F16
+};
+
 void (*Scroll1)(void);
 void (*InvScroll1)(void);
 
@@ -134,48 +139,48 @@ unsigned char __fastcall__ send_fifo_space(void)
 
 void Scroll(unsigned char l)
 {
-  for(ctemp1=l;ctemp1<AM[1];ctemp1++) {
-    line_addr=line[ctemp1];
-    SRC_LINE=line[ctemp1+1];
+  for(zptemp=l;zptemp<AM[1];zptemp++) {
+    dst_addr=line[zptemp];
+    src_addr=line[zptemp+1];
     CopyLine();
   }
-  ClrLine(ctemp1);
-  line_addr=line[ctemp1];
+  ClrLine(zptemp);
+  dst_addr=line[zptemp];
 }
 
 void ScrollRegion(void)
 {
   Scroll(AM[0]);
-  /*  for(ctemp1=AM[0];ctemp1<AM[1];ctemp1++) {
-    line_addr=line[ctemp1];
-    SRC_LINE=line[ctemp1+1];
+  /*  for(zptemp=AM[0];zptemp<AM[1];zptemp++) {
+    dst_addr=line[zptemp];
+    src_addr=line[zptemp+1];
     CopyLine();
   }
-  ClrLine(ctemp1);
-  line_addr=line[ctemp1];*/
+  ClrLine(zptemp);
+  dst_addr=line[zptemp];*/
 }
 
 void InvScroll(unsigned char l)
 {
-  for(ctemp1=AM[1];ctemp1>l;ctemp1--) {
-    line_addr=line[ctemp1];
-    SRC_LINE=line[ctemp1-1];
+  for(zptemp=AM[1];zptemp>l;zptemp--) {
+    dst_addr=line[zptemp];
+    src_addr=line[zptemp-1];
     CopyLine();
   }
-  ClrLine(ctemp1);
-  line_addr=line[ctemp1];
+  ClrLine(zptemp);
+  dst_addr=line[zptemp];
 }
 
 void InvScrollRegion(void)
 {
   InvScroll(AM[0]);
-  /*  for(ctemp1=AM[1];ctemp1>AM[0];ctemp1--) {
-    line_addr=line[ctemp1];
-    SRC_LINE=line[ctemp1-1];
+  /*  for(zptemp=AM[1];zptemp>AM[0];zptemp--) {
+    dst_addr=line[zptemp];
+    src_addr=line[zptemp-1];
     CopyLine();
   }
-  ClrLine(ctemp1);
-  line_addr=line[ctemp1];*/
+  ClrLine(zptemp);
+  dst_addr=line[zptemp];*/
 }
 
 
@@ -200,7 +205,7 @@ void set_pos(void)
       }
     }
   }
-  line_addr=POS(ROW,COL);
+  dst_addr=POS(ROW,COL);
 }
 
 void set_cursor(void)
@@ -306,12 +311,6 @@ void send_cursor(unsigned char c)
   ser_put_raw(ASCII_A+c);
 }
 
-const static unsigned char F_conv[] = {
-   ASCII_P, ASCII_Q, ASCII_R, ASCII_S, ASCII_t, ASCII_u, ASCII_v, ASCII_l,
-   ASCII_w, ASCII_x, 0,       0,       0,       0,       0,       0, // need to fix F9-F16
-};
-
-
 void send_func(unsigned char c)
 {
   if(c<10) {
@@ -342,11 +341,11 @@ void PutTitleAt(unsigned char c)
 {
   conv_str(STR_BUF);
   loc_csave=COL;
-  line_save=line_addr;
+  line_save=dst_addr;
   COL=c;
-  line_addr=SCR_BASE+((c&0xfe)<<2);
+  dst_addr=SCR_BASE+((c&0xfe)<<2);
   PutLine();
-  line_addr=line_save;
+  dst_addr=line_save;
   COL=loc_csave;
 }
 
@@ -354,17 +353,14 @@ void PutLineAt(unsigned char r, unsigned char c)
 {
   conv_str(STR_BUF);
   loc_csave=COL;
-  line_save=line_addr;
+  line_save=dst_addr;
   COL=c;
-  line_addr=POS(r,COL);
+  dst_addr=POS(r,COL);
   PutLine();
-  line_addr=line_save;
+  dst_addr=line_save;
   COL=loc_csave;
 }
 
-
-unsigned char * line_temp;
-unsigned char ctemp;
 
 void title(void)
 {
@@ -394,7 +390,7 @@ void Bitmap_Dis(void)
 
 void Bitmap_Setup(void)
 {
-  line_addr=SCR_BASE;
+  dst_addr=SCR_BASE;
   ClrLineAddr();
   ClrScr();
 

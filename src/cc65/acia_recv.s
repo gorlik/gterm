@@ -63,7 +63,6 @@ save_y:
 	lda #$05		; 2
 	sta _COLOR_BASE+38	; 4 - on screen receive "led"
 
-	;; return from interrupt
 end_nmi:
 	;; restore saved registers
 	ldy save_y 		; 3

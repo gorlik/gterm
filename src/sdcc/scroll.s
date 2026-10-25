@@ -17,177 +17,186 @@
 ;*  along with GTERM.  If not, see <http://www.gnu.org/licenses/>.            *
 ;*                                                                            *
 ;******************************************************************************
-.include "gterm.inc"
+				;//.include "gterm.inc"
+.module scroll80
 	
-.export _ClrScr
-.export _SetColor
-.export _ClrLine
-.export _ClrLineAddr
-.export _ClrLastLine
-.export _ClrFirstLine
-.export _CopyLine
-.export _FS_Scroll1
-.export _FS_InvScroll1
-.export _FS_Scroll4
-.export _FS_Scroll8
+.globl _ClrScr
+.globl _SetColor
+.globl _ClrLine
+.globl _ClrLineAddr
+.globl _ClrLastLine
+.globl _ClrFirstLine
+.globl _CopyLine
+.globl _FS_Scroll1
+.globl _FS_InvScroll1
+;//.globl _FS_Scroll4
+;//.globl _FS_Scroll8
 
-.segment	"CODE"
+.globl _SCR_BASE
+.globl _dst_addr
+.globl _COLOR_BASE
+.globl _line
+.globl _src_addr
+	
+
+.area	CODE
 
 ; ****************** clrscr *********************
 ;  clear screen (skip title line)
-.proc _ClrScr: near
+_ClrScr:
 	ldx #160
-loop:
-	lda #$00
-.repeat 24,line
+clr_loop:
+	lda #0x00
+	line = 0
+.rept 24
 	sta _SCR_BASE-1+(line+1)*320,x
-	sta _SCR_BASE-1+(line+1)*320+160,x	
-.endrepeat
+	sta _SCR_BASE-1+(line+1)*320+160,x
+	line = line + 1
+.endm
 	dex
-	beq done
-	jmp loop
-done:
+	beq clr_done
+	jmp clr_loop
+clr_done:
 	rts
-	.endproc
+
 
 ; ****************** SetColor *********************
 ;  set screen color (skip title line)
-.proc _SetColor: near
+_SetColor: 
 	ldx #240
-loop:
+color_loop:
 	sta _COLOR_BASE+39,x
 	sta _COLOR_BASE+39+240,x	
 	sta _COLOR_BASE+39+480,x
 	sta _COLOR_BASE+39+720,x
 	dex
-	bne loop
+	bne color_loop
 	rts
-.endproc
+
 
 ; ****************** ClrLine *********************
 ;  clear one line
-;;  _line_addr: address of line to clear
-.proc _ClrLine: near
+;;  _dst_addr: address of line to clear
+_ClrLine:
 	asl
 	tay
 	lda _line,y
-	sta _line_addr
+	sta *_dst_addr
 	lda _line+1,y
-	sta _line_addr+1
+	sta *_dst_addr+1
 ;;	jmp _ClrLineAddr
-.endproc
 	
 
-.proc _ClrLineAddr: near
-	lda #$00
+_ClrLineAddr:
+	lda #0x00
 	tay
-loop1:
-	sta (_line_addr),y
+cl_loop1:
+	sta [_dst_addr],y
 	dey
-	bne loop1
-	inc _line_addr+1
+	bne cl_loop1
+	inc *_dst_addr+1
 	ldy #63
-loop2:
-	sta (_line_addr),y
+cl_loop2:
+	sta [_dst_addr],y
 	dey
-	bpl loop2
+	bpl cl_loop2
 	rts
-.endproc
 
 ; ****************** clrfirstline *********************
 ;  clear first line
-.proc _ClrFirstLine: near
+_ClrFirstLine:
 	ldx #80
-	lda #$00
-loop:	
+	lda #0x00
+clrf_loop:	
 	sta _SCR_BASE-1+320,x
 	sta _SCR_BASE-1+320+80,x
 	sta _SCR_BASE-1+320+160,x	
 	sta _SCR_BASE-1+320+240,x	
 	dex
-	bne loop
+	bne clrf_loop
 	rts
-.endproc
 
 	
 ; ****************** clrlastline *********************
 ;  clear last line
-.proc _ClrLastLine: near
+_ClrLastLine:
 	ldx #80
-	lda #$00
-loop:	
+	lda #0x00
+clrl_loop:	
 	sta _SCR_BASE-1+320*24,x
 	sta _SCR_BASE-1+320*24+80,x
 	sta _SCR_BASE-1+320*24+160,x	
 	sta _SCR_BASE-1+320*24+240,x	
 	dex
-	bne loop
+	bne clrl_loop
 	rts
-.endproc
 
 ; ****************** CopyLine *********************
 ;  copy line
-	;; SRC_LINE: address of source line
-	;; _line_addr: address of destination line
-.proc _CopyLine: near
-	ldy #$00
-loop1:
-	lda (_SRC_LINE),y
-	sta (_line_addr),y
+	;; src_addr: address of source line
+	;; _dst_addr: address of destination line
+_CopyLine:
+	ldy #0x00
+cpyl_loop1:
+	lda [_src_addr],y
+	sta [_dst_addr],y
 	dey
-	bne loop1
-	inc _line_addr+1
-	inc _SRC_LINE+1
+	bne cpyl_loop1
+	inc *_dst_addr+1
+	inc *_src_addr+1
 	ldy #63
-loop2:
-	lda (_SRC_LINE),y
-	sta (_line_addr),y
+cpyl_loop2:
+	lda [_src_addr],y
+	sta [_dst_addr],y
 	dey
-	bpl loop2
+	bpl cpyl_loop2
 	rts
-.endproc
 
 	
 ; ****************** Scroll 1 *********************
 ;  scroll the screen by one line (Skip the top line)
-.proc _FS_Scroll1: near
+_FS_Scroll1:
 	ldx #160
-loop:	
-.repeat 23,line
+fs_loop:	
+line = 0
+.rept 23
 	lda _SCR_BASE-1+(line+2)*320,x
 	sta _SCR_BASE-1+(line+1)*320,x
 	lda _SCR_BASE-1+(line+2)*320+160,x
-	sta _SCR_BASE-1+(line+1)*320+160,x	
-.endrepeat
+	sta _SCR_BASE-1+(line+1)*320+160,x
+	line = line + 1
+.endm
 	dex
-	beq done
-	jmp loop
-done:   jmp _ClrLastLine
+	beq fs_done
+	jmp fs_loop
+fs_done:   jmp _ClrLastLine
 ;	rts
-	.endproc
+
 
 ;  ****************** InvScroll ********************* 
 ;  inverse scroll the screen by one line (Skip the top line)
-.proc _FS_InvScroll1: near
+_FS_InvScroll1:
 	ldx #160
-loop:	
-.repeat 23,line
+fsi_loop:
+	line = 0
+.rept 23
 	lda _SCR_BASE-1+(23-line)*320,x
 	sta _SCR_BASE-1+(24-line)*320,x
 	lda _SCR_BASE-1+(23-line)*320+160,x
-	sta _SCR_BASE-1+(24-line)*320+160,x	
-.endrepeat
+	sta _SCR_BASE-1+(24-line)*320+160,x
+	line = line + 1
+.endm
 	dex
-	beq done
-	jmp loop
-done:   jmp _ClrFirstLine
+	beq fsi_done
+	jmp fsi_loop
+fsi_done:   jmp _ClrFirstLine
 	;	rts
-.endproc
 
 
+.if 0
 ; ****************** Scroll 4 *********************
 ;  scroll the screen by 4 lines (Skip the top line)
-.proc _FS_Scroll4: near
+_FS_Scroll4:
 	ldx #160
 loop:	
 .repeat 20,line
@@ -220,3 +229,4 @@ loop:
 done:	
 	rts
 .endproc
+.endif

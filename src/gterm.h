@@ -127,24 +127,24 @@ void __fastcall__ ClrTo(void);
 void __fastcall__ ClrFrom(void);
 
 // zero-page variables from asm
-extern unsigned char * __zp SRC_LINE;
+extern unsigned char * __zp src_addr;
 extern unsigned char __zp ROW;
 extern unsigned char __zp COL;
-extern unsigned char * __zp line_addr;
+extern unsigned char * __zp dst_addr;
 extern unsigned char __zp get,put;
 extern unsigned char __zp c1,c2;
-extern unsigned char __zp ctemp1;
+extern unsigned char __zp zptemp;
 
 #ifndef __SDCC
-#pragma zpsym("SRC_LINE")
-#pragma zpsym("line_addr")
+#pragma zpsym("src_addr")
+#pragma zpsym("dst_addr")
 #pragma zpsym("ROW")
 #pragma zpsym("COL")
 #pragma zpsym("get")
 #pragma zpsym("put")
 #pragma zpsym("c1")
 #pragma zpsym("c2")
-#pragma zpsym("ctemp1")
+#pragma zpsym("zptemp")
 #endif
 
 extern char STR_BUF[];  // temp string buffer
@@ -173,7 +173,7 @@ extern unsigned char tab[10]; // tab stops (80 bits)
 // storage for save/restore cursor
 extern unsigned char col_save, row_save, attr_save; 
 
-extern unsigned char * line_temp;
-extern unsigned char ctemp;
+//extern unsigned char * line_temp;
+//extern unsigned char ctemp;
 
 #endif

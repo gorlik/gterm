@@ -8,7 +8,7 @@
 ;*  the Free Software Foundation, either version 3 of the License, or         *
 ;*  (at your option) any later version.                                       *
 ;*                                                                            *
-;*  GTERM is distributed in the hope that it will be useful,                  *
+;*  GMT is distributed in the hope that it will be useful,                    *
 ;*  but WITHOUT ANY WARRANTY; without even the implied warranty of            *
 ;*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the             *
 ;*  GNU General Public License for more details.                              *
@@ -17,59 +17,33 @@
 ;*  along with GTERM.  If not, see <http://www.gnu.org/licenses/>.            *
 ;*                                                                            *
 ;******************************************************************************
+.setcpu		"6502"
+.autoimport 	on
+.importzp	sp
 
-.segment "ZP_2" : zeropage
-;;  ZP_2 range 0xF7-0xFE
-_line_addr:
-	.res 2
-_get:
-	.res 1
-_put:
-	.res 1
-_c1:	
-	.res 1
-_c2:
-	.res 1
+ACIA_DATA    = (_ACIA_BASE+0)
+ACIA_STATUS  = (_ACIA_BASE+1)
+ACIA_COMMAND = (_ACIA_BASE+2)
+ACIA_CONTROL = (_ACIA_BASE+3)
+ACIA_EXT     = (_ACIA_BASE+7)
 
-.segment "ZEROPAGE" : zeropage
-_SRC_LINE:
-	.res 2
-_ROW:
-	.res 1
-_COL:
-	.res 1
-
-_ctemp1:
-	.res 1
-	
-.exportzp       _line_addr
-.exportzp       _get
-.exportzp       _put
-.exportzp       _c1
-.exportzp       _c2
-	
-.exportzp       _ctemp1
+; from C files
+.import         _soft80_charset	
+.import         _attr
 
 
-;;_SRC_LINE=$D1 			; two bytes
-;;_ROW=$D6
-;;_COL=$D3
+.importzp       _dst_addr
+.importzp       _get
+.importzp       _put
+.importzp       _c1
+.importzp       _c2
+.importzp	_ROW
+.importzp	_COL
+.importzp 	_src_addr
+.importzp       t1
+.importzp       t2
 
-.exportzp _ROW	
-.exportzp _COL
-.exportzp _SRC_LINE	
+.import _SCR_BASE
+.import _SER_BUF
+.import _STR_BUF
 
-_SCR_BASE   = $6000
-_COLOR_BASE = _SCR_BASE-$400
-_SPR_DATA   = _COLOR_BASE-64
-	
-_SER_BUF    = $C800
-_STR_BUF    = $C900
-_ACIA_BASE  = $DE00
-	
-.export _SCR_BASE
-.export _COLOR_BASE
-.export _SPR_DATA
-.export _SER_BUF
-.export _STR_BUF
-.export _ACIA_BASE	

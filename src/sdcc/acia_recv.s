@@ -22,29 +22,27 @@
 
 .globl _NMI
 .globl _ser_recv
+
 .globl _SER_BUF
 .globl _get
 .globl _put
 .globl _ACIA_BASE
 .globl _STR_BUF
-.globl ACIA_COMMAND
 .globl _SCR_BASE
 .globl _COLOR_BASE
 
-_SER_BUF    = 0xC800
-_STR_BUF    = 0xC900
-_ACIA_BASE  = 0xDE00
-ACIA_DATA    = (_ACIA_BASE+0)
-ACIA_STATUS  = (_ACIA_BASE+1)
-ACIA_COMMAND = (_ACIA_BASE+2)
-ACIA_CONTROL = (_ACIA_BASE+3)
-ACIA_EXT     = (_ACIA_BASE+7)
+
+.define ACIA_DATA	"(_ACIA_BASE+0)"
+.define ACIA_STATUS	"(_ACIA_BASE+1)"
+.define ACIA_COMMAND	"(_ACIA_BASE+2)"
+.define ACIA_CONTROL	"(_ACIA_BASE+3)"
+.define ACIA_EXT	"(_ACIA_BASE+7)"
 
 .area	ZP
 save_a:
-	.db 1
+	.ds 1
 save_y:
-	.db 1
+	.ds 1
 	
 .area	CODE
 
@@ -78,7 +76,7 @@ _NMI:
 	;; clear ACIA RTS
 	lda #0x01		; 2
 	sta ACIA_COMMAND	; 4
-	lda #0x05		; 2 
+	lda #0x05		; 2
 	sta _COLOR_BASE+38	; 4 - on screen receive "led"
 
 end_nmi:
