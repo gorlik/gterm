@@ -140,7 +140,7 @@ void escape_mode_imm(void)
     for(ctemp1=0;ctemp1<EP_MAX;ctemp1++) e[ctemp1]=0;
     ep=0;
     break;
-  case '7': // DECSC save cursor
+  case ASCII_7: // DECSC save cursor
     col_save=COL;
     row_save=ROW;
     attr_save=attr;
@@ -148,7 +148,7 @@ void escape_mode_imm(void)
     G_s[0]=G[0];
     G_s[1]=G[1];
     break;
-  case '8': // DECRC restore cursor
+  case ASCII_8: // DECRC restore cursor
     COL=col_save;
     ROW=row_save;
     attr=attr_save;
@@ -177,7 +177,7 @@ void escape_mode_imm(void)
   case 0x3E: // DECKPNM  kepypad numeric mode
     break;
     
-  case 0x44: // 'D' IND index
+  case ASCII_D: // 0x44 'D' IND index
     //    sprintf(STR_BUF,"ID %02d %02d L %02d %02d",ROW,COL,AM[0],AM[1]);
     //    PutTitleAt(48);
     if(ROW>=AM[1]) Scroll1();
@@ -300,47 +300,47 @@ void escape_mode_csi(void)
     else if(c1==0x3F) esc_mode=4; // "[?" sequence
     else if(isprint(c1)) {
       switch(c1) {
-      case 0x41: // 'A' CUU cursor up
+      case ASCII_A: // 0x41 'A' CUU cursor up
 	e[0]=e[0]?e[0]:1;
 	if(ROW>e[0]) ROW-=e[0];
 	  else ROW=0;
 	if(ROW<AM[0]) ROW=AM[0];
 	break;
 	
-      case 0x42: // 'B' CUD cursor down
+      case ASCII_B: // 0x42 'B' CUD cursor down
 	ROW+=e[0]?e[0]:1;
 	if(ROW>AM[1]) ROW=AM[1]; // prevent scrolling
 	break;
 	
-      case 0x43: // 'C' CUF cursor forward
+      case ASCII_C: // 0x43 'C' CUF cursor forward
 	COL+=e[0]?e[0]:1;
 	if(COL>79) COL=79; // prevent scrolling
 	break;
 	
-      case 0x44: // 'D' CUB cursor backwards
+      case ASCII_D: // 0x44 'D' CUB cursor backwards
 	e[0]=e[0]?e[0]:1;
 	if(COL>e[0]) COL-=e[0];
 	  else COL=0;
 	break;
 
 #ifdef ANSI
-      case 0x45: // 'E' cursor next line
+      case ASCII_E: // 0x45 'E' cursor next line
 	ROW+=e[0]?e[0]:1;
 	COL=0;
     	break;
 	
-      case 0x46: // 'F' cursor prev line
+      case ASCII_F: // 0x46 'F' cursor prev line
 	ROW-=e[0]?e[0]:1;
 	COL=0;
 	break;
 	
-      case 0x47: // 'G'  cursor absolute col
+      case ASCII_G: // 0x47 'G'  cursor absolute col
 	COL=e[0]?e[0]-1:0;
 	break;
 #endif
 	
-      case 0x66: // 'f' HVP cursor absolute pos
-      case 0x48: // 'H' CUP
+      case ASCII_f: // 0x66 'f' HVP cursor absolute pos
+      case ASCII_H: // 0x48 'H' CUP
 	//	sprintf(STR_BUF,"H %02d %02d %02d %02d %02x",e[0],e[1],AM[0],AM[1],priv_mode[0]);
 	//	PutTitleAt(60);
 
@@ -356,7 +356,7 @@ void escape_mode_csi(void)
 	COL=e[1]?e[1]-1:0;
 	break;
 
-      case 0x4A: // 'J' ED erase display
+      case ASCII_J: // 0x4A 'J' ED erase display
 	//	line_addr=POS(ROW,COL);
 	switch(e[0]) {
 	case 1: // erase lines to cursor position
@@ -380,7 +380,7 @@ void escape_mode_csi(void)
 	line_addr=POS(ROW,COL);
 	break;
 	
-      case 0x4B: // 'K' EL erase line
+      case ASCII_K: // 0x4B 'K' EL erase line
 	switch(e[0]) {
 	case 1: // erase line to cursor
 	  line_addr=line[ROW];
@@ -398,21 +398,21 @@ void escape_mode_csi(void)
 //	set_cursor();
 	break;
 #ifdef VT102
-      case 0x4c: // 'L' - IL Insert Line
+      case ASCII_L: // 0x4C 'L' - IL Insert Line
 	if(ROW>=AM[0] && ROW<=AM[1]) {
 	  InvScroll(ROW);
 	  ClrLine(ROW);
 	  for(i=1;i<e[0];i++) InvScroll(ROW);
 	}
 	break;
-      case 0x4d: // 'M' - DL Delete Line
+      case ASCII_M: // 0x4D 'M' - DL Delete Line
 	if(ROW>=AM[0] && ROW<=AM[1]) {
 	  Scroll(ROW);
 	  ClrLine(AM[1]);
 	  for(i=1;i<e[0];i++) Scroll(ROW);
 	}
 	break;	
-      case 0x50: // 'P' - DCH Delete Character
+      case ASCII_P: // 0x50 'P' - DCH Delete Character
 	e[0]=e[0]?e[0]:1;
 	delete_char(e[0]);
 	ctemp=COL;
@@ -427,13 +427,13 @@ void escape_mode_csi(void)
 
 	
 #ifdef ANSI	
-      case 0x53: // 'S'
+      case ASCII_S: // 0x53 'S'
 	if(e[0]==0) ++e[0];
 	for(i=0;i<e[0];i++)
 	  Scroll1();
 	break;
 
-      case 0x58: // 'X'
+      case ASCII_X: // 0x58 'X'
 	if(e[0]==0) ++e[0];
 	ctemp=COL;
 	c1=' ';
@@ -451,22 +451,22 @@ void escape_mode_csi(void)
 	break;
 #endif
 	
-      case 0x63: // 'c' DA device attributes
+      case ASCII_c: // 0x63 'c' DA device attributes
 	if(e[0]==0) {
 	  send_str("\x1b[?1;0c"); // VT100 with no options
 	}
 	break;
 
 #ifdef ANSI
-      case 0x64: // 'd'
+      case ASCII_d: // 0x64 'd'
 	ROW=e[0]?e[0]-1:0;
 	break;
 
-      case 0x65: // 'e'
+      case ASCII_e: // 0x65 'e'
 	ROW+=e[0]?e[0]:1;
 	break;
 #endif
-      case 0x67: // 'g' TBC tab clear
+      case ASCII_g: // 0x67 'g' TBC tab clear
 	if(e[0]==3) {
 	for(ctemp1=0;ctemp1<10;++ctemp1)
 	  tab[ctemp1]=0;
@@ -476,14 +476,14 @@ void escape_mode_csi(void)
 	}
 	break;
 
-      case 0x68: // 'h' SM set mode
-      case 0x6C: // 'l' RM reset mode
+      case ASCII_h: // 0x68 'h' SM set mode
+      case ASCII_l: // 0x6C 'l' RM reset mode
 	// should check for e[0]==20
 	if(c1==0x68) priv_mode[0]|=ANSI_LNM;
 	else priv_mode[0]&=~ANSI_LNM;
 	break;
 	
-      case 0x6D: // 'm' SGR set graphics rendition
+      case ASCII_m: // 0x6D 'm' SGR set graphics rendition
 	for(i=0;i<ep+1;i++) {
 	  if(e[i]==0) attr=0;
           if(e[i]==4) attr|=ATTR_UNDERLINE;
@@ -494,7 +494,7 @@ void escape_mode_csi(void)
 	//	PutTitleAt(36);
 	break;
 	
-      case 0x6E: // 'n' DSR device status report
+      case ASCII_n: // 0x6E 'n' DSR device status report
 	if(e[0]==5) { // report status
 	  send_str("\x1b[0n"); // status ready
 	} else if(e[0]==6) { // CPR report active position
@@ -506,7 +506,7 @@ void escape_mode_csi(void)
 	}
 	break;
 
-      case 0x72: // 'r' DECSTBM set top and bottom margins
+      case ASCII_r: // 0x72 'r' DECSTBM set top and bottom margins
 	AM[0]=e[0]?e[0]-1:0;
 	AM[1]=e[1]?e[1]-1:23;
 	COL=0;
@@ -565,7 +565,7 @@ void escape_mode_hash(void)
   // parse the "#" DEC private sequences
   // should parse for sequence '8' - fill screen with 'E'
   switch(c1) {
-  case '8':
+  case ASCII_8:
     for(x=0;x<80;x++) STR_BUF[x]=ASCII_E;
     for(x=0;x<24;x++) {
       COL=0;
@@ -593,14 +593,14 @@ void escape_mode_priv(void)
       for(i=0;i<ep+1;i++) {
 	switch(e[i]) {
 	case 1: // DECCKM 
-	  if(c1==0x68) priv_mode[0]|=PRIV_DECCKM;
+	  if(c1==ASCII_h) priv_mode[0]|=PRIV_DECCKM;
 	  else priv_mode[0]&=~PRIV_DECCKM;
 	  break;
 	  //	  case 2: // DECANM ANSI/VT52 mode
 	  //	    break;
 	case 3: // DECCOLM screen columns
 	  // 132 column - not implemented
-	  if(c1==0x68) priv_mode[1]|=PRIV_DECCOLM;
+	  if(c1==ASCII_h) priv_mode[1]|=PRIV_DECCOLM;
 	  else priv_mode[1]&=~PRIV_DECCOLM;
 	  // standard VT100 docs say screen should be cleared on mode switch
 	  ClrScr();
@@ -608,11 +608,11 @@ void escape_mode_priv(void)
 	  line_addr=line[0];
 	  break;
 	case 4: // DECSCLM smooth scroll
-	  if(c1==0x68) priv_mode[1]|=PRIV_DECSCLM;
+	  if(c1==ASCII_h) priv_mode[1]|=PRIV_DECSCLM;
 	  else priv_mode[1]&=~PRIV_DECSCLM;
 	  break;
 	case 5: // DECSCNM screen mode
-	  if(c1==0x68) {
+	  if(c1==ASCII_h) {
 	    SetColor(0x01);
 	    VIC.spr0_color=0x00;
 	    priv_mode[1]|=PRIV_DECSCNM;
@@ -623,7 +623,7 @@ void escape_mode_priv(void)
 	  }
 	  break;
 	case 6: // DECOM origin
-	  if(c1==0x68) {
+	  if(c1==ASCII_h) {
 	    priv_mode[0]|=PRIV_DECOM;
 	    ROW=AM[0];
 	  } else {
@@ -638,22 +638,22 @@ void escape_mode_priv(void)
 #endif
 	  break;
 	case 7: // DECAWM 
-	  if(c1==0x68) priv_mode[0]|=PRIV_DECAWM;
+	  if(c1==ASCII_h) priv_mode[0]|=PRIV_DECAWM;
 	  else priv_mode[0]&=~PRIV_DECAWM;
 	  break;
 	case 8: // DECARM auto repeat mode
-	  if(c1==0x68) priv_mode[1]|=PRIV_DECARM;
+	  if(c1==ASCII_h) priv_mode[1]|=PRIV_DECARM;
 	  else priv_mode[1]&=~PRIV_DECARM;
 	  break;
 	case 9: // DECINLM interlace
-	  if(c1==0x68) priv_mode[1]|=PRIV_DECINLM;
+	  if(c1==ASCII_h) priv_mode[1]|=PRIV_DECINLM;
 	  else priv_mode[1]&=~PRIV_DECINLM;
 	  break;
 	  //	  case 20: // LNM line feed mode
 	  //	    break;
 	default:
 #ifdef DEBUG
-	  if(c1==0x68) sprintf(STR_BUF,"set?   %02x [%d]        ",e[i],ep);
+	  if(c1==ASCII_h) sprintf(STR_BUF,"set?   %02x [%d]        ",e[i],ep);
 	  else sprintf(STR_BUF,"reset? %02x [%d]         ",e[i],ep);
 	  PutTitleAt(48);
 #endif
