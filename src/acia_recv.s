@@ -1,7 +1,7 @@
 ;******************************************************************************
 ;*  GTERM - GGLABS TERMINAL                                                   *
 ;*  A fast 80 columns terminal for the C64                                    *
-;*  Copyright 2019 Gabriele Gorla                                             *
+;*  Copyright 2019-2026 Gabriele Gorla                                        *
 ;*                                                                            *
 ;*  This program is free software: you can redistribute it and/or modify      *
 ;*  it under the terms of the GNU General Public License as published by      *
@@ -21,31 +21,34 @@
 	
 .export _NMI
 .export _ser_recv
+
+.segment	"ZEROPAGE" : zeropage
+save_a:
+	.res 1
+save_y:
+	.res 1
 	
 .segment	"CODE"
 
 ;; ****************** NMI Interrupt *********************
-;; 59-60 cycles (70 when clearing RTS) + NMI entry 
+;; 53-54 cycles (64 when clearing RTS) + NMI entry 
 .proc _NMI: near
-	pha 			; 3
- 	;;	txa		; 2
-	;; 	pha		; 3
-	;; save y
-	tya 			; 2
-	pha			; 3
+	;; save used registers
+	sta save_a 		; 3
+	sty save_y 		; 3
 	
-	ldy _put		; 3
 	;; interrrupt ack
 	lda ACIA_STATUS 	; 4
 
 	;; receive a char
 	lda ACIA_DATA 		; 4
+	ldy _put		; 3
 	sta _SER_BUF,y		; 4
 	iny			; 2
 	sty _put		; 3
 
 	;; border color on receive
-	;;	sty $d020	; 4
+	;;sty $d020		; 4
 
 	;; check for buffer full
 	;;	clc 		; 2 - this is not exact as it might be 1 off but it's 2 cycles faster
@@ -62,11 +65,9 @@
 
 	;; return from interrupt
 end_nmi:
-	pla			; 4
-	tay			; 2
-	;;	pla
-	;; 	tax
-	pla			; 4
+	;; restore saved registers
+	ldy save_y 		; 3
+	lda save_a 		; 3
 	rti			; 6
 .endproc
 

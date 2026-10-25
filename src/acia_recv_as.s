@@ -17,7 +17,7 @@
 ;*  along with GTERM.  If not, see <http://www.gnu.org/licenses/>.            *
 ;*                                                                            *
 ;******************************************************************************
-				;.include "gterm.inc"
+;.include "gterm.inc"
 .module acia_recv
 
 .globl _NMI
@@ -40,31 +40,33 @@ ACIA_COMMAND = (_ACIA_BASE+2)
 ACIA_CONTROL = (_ACIA_BASE+3)
 ACIA_EXT     = (_ACIA_BASE+7)
 
+.area	ZP
+save_a:
+	.db 1
+save_y:
+	.db 1
 	
 .area	CODE
 
 ;; ****************** NMI Interrupt *********************
-;; 59-60 cycles (70 when clearing RTS) + NMI entry 
+;; 53-54 cycles (64 when clearing RTS) + NMI entry 
 _NMI:
-	pha 			; 3
- 	;;	txa		; 2
-	;; 	pha		; 3
-	;; save y
-	tya 			; 2
-	pha			; 3
+	;; save used registers
+	sta *save_a 		; 3
+	sty *save_y 		; 3
 
-	ldy *_put		; 3
 	;; interrrupt ack
 	lda ACIA_STATUS 	; 4
 
 	;; receive a char
 	lda ACIA_DATA 		; 4
+	ldy *_put		; 3
 	sta _SER_BUF,y		; 4
 	iny			; 2
 	sty *_put		; 3
 
 	;; border color on receive
-	;;	sty $d020	; 4
+	;;sty 0xd020		; 4
 
 	;; check for buffer full
 	;;	clc 		; 2 - this is not exact as it might be 1 off but it's 2 cycles faster
@@ -79,13 +81,10 @@ _NMI:
 	lda #0x05		; 2 
 	sta _COLOR_BASE+38	; 4 - on screen receive "led"
 
-	;; return from interrupt
 end_nmi:
-	pla			; 4
-	tay			; 2
-	;;	pla
-	;; 	tax
-	pla			; 4
+	;; restore saved registers
+	ldy *save_y 		; 3
+	lda *save_a 		; 3
 	rti			; 6
 
 _ser_recv:
@@ -93,12 +92,12 @@ _ser_recv:
 .if 0
 ;; ------------- polling receive ------------------
 .proc _ser_recv: near
-	ldx #$F0		; 2
+	ldx #0xF0		; 2
 	ldy *_put		; 3
 	sei			; 2
 
 	lda ACIA_STATUS 	; 4 - check if a char is waiting in the buffer
-	and #$08		; 2
+	and #0x08		; 2
 	beq set_rts		; 2-4
 	lda ACIA_DATA 		; 4
 	sta _SER_BUF,y		; 4
@@ -106,9 +105,9 @@ _ser_recv:
 
 set_rts:
 	;; set RTS
-	lda #$01		; 2
+	lda #0x01		; 2
 	sta _COLOR_BASE+38	; 4
-	lda #$0B		; 2
+	lda #0x0B		; 2
 	sta ACIA_COMMAND	; 4
 
 ;; read loop
@@ -116,7 +115,7 @@ set_rts:
 loop:
 	;; 	inc $d020
 	lda ACIA_STATUS 	; 4
-	and #$08		; 2
+	and #0x08		; 2
 	beq no_recv		; 2-4
 	;; receive a char
 recv:
@@ -124,13 +123,13 @@ recv:
 	sta _SER_BUF,y		; 4
 	iny			; 2
 	;; border color on receive
-	;;	sty $d020		; 4
+	;;	sty 0xd020		; 4
 
 	;; check for buffer full - no need as we only try to receive up to 256 chars
 	;;	clc 			; 2
 	;; 	tya 			; 2
 	;; 	sbc _get 		; 3
-	;; 	cmp #$F0 		; 2
+	;; 	cmp #0xF0 		; 2
 	;; 	bpl last 		; 2
 	
 no_recv:
@@ -139,14 +138,14 @@ no_recv:
 
 last:
 	;; clear RTS	
-	lda #$03		; 2
+	lda #0x03		; 2
 	sta ACIA_COMMAND	; 4
-	lda #$05		; 2
+	lda #0x05		; 2
 	sta _COLOR_BASE+38
 
 	;; check if one more char in the buffer
 	lda ACIA_STATUS 	; 4
-	and #$08		; 2
+	and #0x08		; 2
 	beq end			; 2-4
 	lda ACIA_DATA 		; 4
 	sta _SER_BUF,y		; 4
