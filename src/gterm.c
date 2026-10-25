@@ -25,7 +25,7 @@
 #include "asc_ctype.h"
 #include "ascii_define.h"
 
-#define VERSION "0.21"
+#define VERSION "0.22"
 
 #define SPR_BASE   (COLOR_BASE+0x3f8)
 

@@ -148,7 +148,7 @@ extern unsigned char __zp ctemp1;
 #endif
 
 extern char STR_BUF[];  // temp string buffer
-extern char SER_BUF[];  // rx buffer
+extern unsigned char SER_BUF[];  // rx buffer
 extern unsigned char SCR_BASE[]; // screen base
 extern unsigned char COLOR_BASE[]; // color base
 extern unsigned char SPR_DATA[];   // cursor sprite
@@ -156,7 +156,7 @@ extern unsigned char SPR_DATA[];   // cursor sprite
 extern volatile struct acia_t ACIA_BASE;
 
 extern const unsigned char soft80_charset[]; // soft80 font
-extern const char conv_table[256];  // petscii to ascii
+extern const unsigned char conv_table[256];  // petscii to ascii
 extern unsigned char * const line[];           // precomputed line address
 
 // global variables
