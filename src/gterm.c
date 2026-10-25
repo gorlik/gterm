@@ -129,7 +129,7 @@ unsigned char __fastcall__ recv_fifo_fill(void)
 
 unsigned char __fastcall__ send_fifo_space(void)
 {
-  return 0x1f-(send_put-send_get)&0x1f;
+  return (0x1f-send_put+send_get)&0x1f;
 }
 
 void Scroll(unsigned char l)
@@ -378,6 +378,7 @@ void Bitmap_En(void)
   VIC.ctrl1=0x3B; // enable bitmap, no extended color, no blank, 25 rows, ypos=3
   //  CIA2.pra=0x00;  // selects VIC page 0xC000-0xFFFF
   CIA2.pra=0x2;  // selects VIC page 0x4000-0x7FFF
+  // CIA2.pra=~(((unsigned int)SCR_BASE>>14)&0x3);  // selects VIC page
   
   //  VIC.addr=0x68;  
   VIC.addr=0x78;  // color ram at base +0x1c00, bitmap at base + 0x2000
@@ -495,11 +496,22 @@ void main(void)
   set_cursor();
   VIC.spr_ena=0x01;
 
-
   for(;;) { // main loop
     
     //  if(put!=get) {
     if(recv_fifo_fill()) {
+
+#if 0
+{
+  static unsigned char pp = 0 ;
+      sprintf(STR_BUF,"%02x  ",SER_BUF[get]);
+      PutTitleAt(pp);
+      pp = (pp+2)&0x3f;
+
+      sprintf(STR_BUF,"%3d %3d",COL, ROW);
+      PutTitleAt(68);
+}
+#endif
 
       if(!esc_mode) {
 #if 1
