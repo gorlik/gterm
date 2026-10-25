@@ -306,7 +306,7 @@ void send_cursor(unsigned char c)
   ser_put_raw(ASCII_A+c);
 }
 
-static unsigned char F_conv[] = {
+const static unsigned char F_conv[] = {
    ASCII_P, ASCII_Q, ASCII_R, ASCII_S, ASCII_t, ASCII_u, ASCII_v, ASCII_l,
    ASCII_w, ASCII_x, 0,       0,       0,       0,       0,       0, // need to fix F9-F16
 };

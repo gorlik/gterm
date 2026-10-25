@@ -42,9 +42,13 @@
 
 
 .area ZP
+_SRC_LINE::
 t1:
 	.db 1
 t2:
+	.db 1
+_line_addr::
+	.db 1
 	.db 1
 _c1::
 	.db 1
@@ -54,8 +58,12 @@ _get::
 	.db 1
 _put::
 	.db 1
-_line_addr::
-	.db 2
+_ROW::
+	.db 1
+_COL::
+	.db 1
+_ctemp1::
+	.db 1
 	
 .area CODE
 

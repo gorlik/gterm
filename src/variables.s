@@ -31,15 +31,30 @@ _c1:
 _c2:
 	.res 1
 
+.segment "ZEROPAGE" : zeropage
+_SRC_LINE:
+	.res 2
+_ROW:
+	.res 1
+_COL:
+	.res 1
+
+_ctemp1:
+	.res 1
+	
 .exportzp       _line_addr
 .exportzp       _get
 .exportzp       _put
 .exportzp       _c1
 .exportzp       _c2
 	
-_SRC_LINE=$D1 			; two bytes	
-_ROW=$D6
-_COL=$D3
+.exportzp       _ctemp1
+
+
+;;_SRC_LINE=$D1 			; two bytes
+;;_ROW=$D6
+;;_COL=$D3
+
 .exportzp _ROW	
 .exportzp _COL
 .exportzp _SRC_LINE	

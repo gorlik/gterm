@@ -23,11 +23,9 @@
 
 #ifdef __SDCC
 #define __fastcall__
+#else
+#define __zp
 #endif
-
-// zero page variables
-#define ctemp1_ptr    0xA3
-#define ctemp1       (*((unsigned char *) ctemp1_ptr))
 
 #define POS(r,c)     (line[r]+((c&0xfe)<<2))
 
@@ -128,29 +126,25 @@ void __fastcall__ Put2Char80(void);
 void __fastcall__ ClrTo(void);
 void __fastcall__ ClrFrom(void);
 
-// zero-page variables from ASM
-#ifdef __SDCC
-unsigned char *  __zp __at (0xd1) SRC_LINE;
+// zero-page variables from asm
+extern unsigned char * __zp SRC_LINE;
+extern unsigned char __zp ROW;
+extern unsigned char __zp COL;
 extern unsigned char * __zp line_addr;
-unsigned char __zp __at (0xd6) ROW;
-unsigned char __zp __at (0xd3) COL;
 extern unsigned char __zp get,put;
 extern unsigned char __zp c1,c2;
-#else
-extern unsigned char * SRC_LINE;
+extern unsigned char __zp ctemp1;
+
+#ifndef __SDCC
 #pragma zpsym("SRC_LINE")
-extern unsigned char * line_addr;
 #pragma zpsym("line_addr")
-extern unsigned char ROW;
-extern unsigned char COL;
 #pragma zpsym("ROW")
 #pragma zpsym("COL")
-extern unsigned char get,put;
 #pragma zpsym("get")
 #pragma zpsym("put")
-extern unsigned char c1,c2;
 #pragma zpsym("c1")
 #pragma zpsym("c2")
+#pragma zpsym("ctemp1")
 #endif
 
 extern char STR_BUF[];  // temp string buffer
