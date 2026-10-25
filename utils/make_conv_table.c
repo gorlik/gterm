@@ -153,7 +153,7 @@ unsigned char conv_table[0xc0] =
    'X',                  /* X                0x78       SPACE */
    'Y',                  /* Y                0x79       SPACE */
    'Z',                  /* Z                0x7a       SPACE          */
-   '|',                  /* |                0x7b       SHIFT + '+'    */  
+   '|',                  /* |                0x7b       SHIFT + '+'    */
    0xff,                 /* NO_MAP           0x7c       CBM + '-'      */
    '_',                  /* _                0x7d       SHIFT + '-'    */
    '~',                  /* ~                0x7e       PI             */
@@ -254,7 +254,9 @@ int main(int argc, char *argv[])
       printf("/* char_tables.c */\n");
       printf("/* PETSCII to ASCII */\n\n");
 
-      printf("#ifndef __SDCC\n");
+      printf("#ifdef __SDCC\n");
+      printf("#pragma constseg TABLES\n");
+      printf("#else\n");
       printf("#pragma rodata-name (\"TABLES\")\n");
       printf("#endif\n\n");
 
