@@ -1,4 +1,4 @@
-SDCCROOT = /mnt/share/local/sdcc-svn/bin
+SDCCROOT = /mnt/share/local/sdcc-460/bin
 SDCC = $(SDCCROOT)/sdcc
 SDAS = $(SDCCROOT)/sdas6500
 MAKEBIN = $(SDCCROOT)/makebin
@@ -12,8 +12,8 @@ SDKINC = -I $(SDKROOT)/include
 VPATH=../src
 INCLUDE=../src
 SYS_INCLUDE=../src
-CART = --code-loc 0x8000 --xram-loc 0x1000 $(SDKROOT)/lib/c64_cart_crt0.rel
-PRG = --code-loc 0x7ff --xram-loc 0x8000 $(SDKROOT)/lib/c64_prg_crt0.rel
+CART = --code-loc 0x8000 --xram-loc 0x1000 --data-loc 0x0002 $(SDKROOT)/lib/c64_cart_crt0.rel
+PRG = --code-loc 0x7ff --xram-loc 0x8000 --data-loc 0x0002 $(SDKROOT)/lib/c64_prg_crt0.rel
 LIBS = -l c64.lib
 
 CFLAGS = $(TARGET) $(SDCCOPT) $(SDKINC)
@@ -37,8 +37,12 @@ char_tables.rel: char_tables.c
 soft80-font.rel: soft80-font.c
 	$(SDCC) $(CFLAGS) --constseg TABLES -c -o $@ $<
 
+#vt100-escape.rel: vt100-escape.c
+#	$(SDCC) $(CFLAGS) --no-zp-spill -c -o $@ $<
+
 %.bin: %.rel $(OBJECTS)
-	$(SDCC) $(LDFLAGS) $(CART) $(LIBS) $(OBJECTS) -Wl-aTABLES=0xb600 $< -o $@.ihx
+	$(SDCC) $(LDFLAGS) $(CART) $(LIBS) $(OBJECTS) -Wl-bTABLES=0xb600 $< -o $@.ihx
+#	$(SDCC) $(LDFLAGS) $(CART) $(LIBS) $(OBJECTS) -Wl-bTABLES=0xb600 -Wl-bOSEG=0xf7 $< -o $@.ihx
 	$(MAKEBIN) -o 0x8000 -s 0xc000 $@.ihx $@
 
 
