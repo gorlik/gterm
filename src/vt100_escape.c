@@ -40,6 +40,7 @@ static const unsigned char shift[8] =
 //#define VT102
 
 //#define DEBUG
+//#define TAB_DEBUG
 
 #ifdef ESC_DEBUG
 void debug_char(unsigned char w)
@@ -54,12 +55,12 @@ void debug_char(unsigned char w)
 void parse_control(void)
 {
   switch(c1) {
-  case 0x00: // NULL
-  case 0x07: // BELL
+  case ASCII_NUL: // 0x00 NULL
+  case ASCII_BEL: // 0x07 BELL
     break;
 
-    //   case 0x7F: // DEL
-  case 0x08: // backspace
+    //   case ASCII_DEL: // 0x7F DEL
+  case ASCII_BS: // 0x08 backspace
 #ifndef ESC_DEBUG
     if(COL) {
       if(COL<79) --COL;
@@ -71,7 +72,7 @@ void parse_control(void)
 #endif    
     break;
     
-  case 0x09: // HTAB
+  case ASCII_HT: // 0x09 HTAB
     if(COL<78) {
       for(ctemp1=COL+1;ctemp1<79;ctemp1++) {
 	if(tab[ctemp1>>3]&shift[ctemp1&0x7]) break;
@@ -88,9 +89,9 @@ void parse_control(void)
     set_pos();
     break;
     
-  case 0x0A: // Line Feed
-  case 0x0B: // VTAB
-  case 0x0C: // Form Feed
+  case ASCII_LF: // 0x0A Line Feed
+  case ASCII_VT: // 0x0B VTAB
+  case ASCII_FF: // 0x0C Form Feed
     #ifndef ESC_DEBUG
         //    sprintf(STR_BUF,"LF %02d %02d L %02d %02d",ROW,COL,AM[0],AM[1]);
     //    PutTitleAt(40);
@@ -103,17 +104,17 @@ void parse_control(void)
     #endif
     break;
     
-  case 0x0D: // CR
+  case ASCII_CR: // 0x0D CR
     COL=0;
     set_pos();
     break;
-  case 0x0E: // shift out - use G1 char set
+  case ASCII_SO: // 0x0E shift out - use G1 char set
     g_act=1;
     break;
-  case 0x0F: // shift in - use G0 char set
+  case ASCII_SI: // 0x0F shift in - use G0 char set
     g_act=0;
     break;
-  case 0x1B: // ESCAPE
+  case ASCII_ESC: // 0x1B ESCAPE
 #ifndef ESC_DEBUG
     esc_mode=1;
 #else
@@ -135,12 +136,12 @@ void escape_mode_imm(void)
 {
   esc_mode=0; 
   switch(c1) {
-  case 0x5B:  // '['
+  case ASCII_BRACKET_OPEN:  // 0x5B '['
     esc_mode=2; 
     for(ctemp1=0;ctemp1<EP_MAX;ctemp1++) e[ctemp1]=0;
     ep=0;
     break;
-  case ASCII_7: // DECSC save cursor
+  case ASCII_7: // 0x37 '7' DECSC save cursor
     col_save=COL;
     row_save=ROW;
     attr_save=attr;
@@ -148,7 +149,7 @@ void escape_mode_imm(void)
     G_s[0]=G[0];
     G_s[1]=G[1];
     break;
-  case ASCII_8: // DECRC restore cursor
+  case ASCII_8: // 0x38 '8' DECRC restore cursor
     COL=col_save;
     ROW=row_save;
     attr=attr_save;
@@ -158,23 +159,23 @@ void escape_mode_imm(void)
     //  if(ROW<AM[0]) ROW=AM[0];
     //  if(ROW>AM[1]) ROW=AM[1];
     break;
-  case 0x18: // CAN
-  case 0x1A: // SUB
+  case ASCII_CAN: // 0x18 CAN
+  case ASCII_SUB: // 0x1A SUB
     // cancel escape sequence
     break;
-  case 0x23: // DEC private sequences
+  case ASCII_HASH: // 0x23 '#' DEC private sequences
     esc_mode=3;
     break;
-  case 0x28: // '('
-  case 0x29: // ')'
-  case 0x2A: // '*'
-  case 0x2B: // '+' 
+  case ASCII_PAR_OPEN: // 0x28 '('
+  case ASCII_PAR_CLOSE: // 0x29 ')'
+  case ASCII_STAR: // 0x2A '*'
+  case ASCII_PLUS: // 0x2B '+' 
     // character set select commands   
     esc_mode=5;
     g_set=c1-0x28;
     break;
-  case 0x3D: // DECKPAM  keypad application mode
-  case 0x3E: // DECKPNM  kepypad numeric mode
+  case ASCII_EQUAL: // 0x3D '=' DECKPAM  keypad application mode
+  case ASCII_GREATER_THAN: // 0x3E '>' DECKPNM  kepypad numeric mode
     break;
     
   case ASCII_D: // 0x44 'D' IND index
@@ -183,14 +184,14 @@ void escape_mode_imm(void)
     if(ROW>=AM[1]) Scroll1();
     else ++ROW;
     break;
-  case 0x45: // 'E' NEL next line
+  case ASCII_E: // 0x45 'E' NEL next line
     //    sprintf(STR_BUF,"NL %02d %02d L %02d %02d",ROW,COL,AM[0],AM[1]);
     //    PutTitleAt(48);
     COL=0;
     if(ROW>=AM[1]) Scroll1();
     else ++ROW;
     break;
-  case 0x48: // 'H' tab set
+  case ASCII_H: // 0x48 'H' tab set
     if(COL<80)
       tab[COL>>3]|=(1<<(COL&0x7));
 #ifdef TAB_DEBUG
@@ -199,7 +200,7 @@ void escape_mode_imm(void)
     PutTitleAt(48);
 #endif
     break;
-  case 0x4D: // 'M' RI reverse index
+  case ASCII_M: // 0x4D 'M' RI reverse index
     //        sprintf(STR_BUF,"RI %02d %02d L %02d %02d",ROW,COL,AM[0],AM[1]);
     //        PutTitleAt(40);
     if(ROW>AM[0]) --ROW;
@@ -208,8 +209,8 @@ void escape_mode_imm(void)
     }
     break;
 #ifdef VT102
-  case 0x4E: // 'N' SS2 Single shift 2
-  case 0x4F: // 'O' SS2 Single shift 2
+  case ASCII_N: // 0x4E 'N' SS2 Single shift 2
+  case ASCII_O: // 0x4F 'O' SS2 Single shift 2
     break;
 #endif
   default:
@@ -442,11 +443,11 @@ void escape_mode_csi(void)
 	COL=ctemp;
 	break;
 	
-      case 0x60:
+      case ASCII_REV_QUOTE: // 0x60 '`'
 	COL+=e[0]?e[0]-1:0;
 	break;
 	
-      case 0x61:
+      case ASCII_a: // 0x61  'a'
 	COL+=e[0]?e[0]:1;
 	break;
 #endif
